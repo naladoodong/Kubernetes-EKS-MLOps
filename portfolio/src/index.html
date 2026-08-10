@@ -367,7 +367,7 @@
                 <span class="mono-tag">OUTBOX</span>
                 <h3>Transactional event intent</h3>
                 <p>Business changes and OutboxEvent commit in one PostgreSQL transaction. Publishing happens afterward.</p>
-                <p class="reliability-note">Guarantee: at-least-once delivery + idempotent consumer</p>
+                <p class="reliability-note">Retention: published 30 days → cleanup; unpublished never auto-deleted</p>
               </article>
               <article>
                 <span class="mono-tag">CAS</span>
@@ -377,9 +377,9 @@
               </article>
               <article>
                 <span class="mono-tag">RECONCILE</span>
-                <h3>Periodic convergence</h3>
-                <p>A 60-second reconciler compares RDS intent with Kubernetes observations and repairs missed wake-ups.</p>
-                <p class="reliability-note">Recovers: message loss, DLQ, restarts, drift</p>
+                <h3>Repair-path convergence</h3>
+                <p>The initial 60-second loop compares RDS intent with Kubernetes observations. It is a repair path, not event latency or a user-facing SLO.</p>
+                <p class="reliability-note">Shorter: more polling load · Longer: more recovery lag</p>
               </article>
               <article>
                 <span class="mono-tag">CHECKPOINT</span>
@@ -400,9 +400,81 @@
   <span class="code-keyword">AND</span> status = <span class="code-value">'SCHEDULING'</span>;</code></pre>
               <div class="code-explanation">
                 <p><strong>Why it matters</strong></p>
-                <p>Duplicate messages and competing observations become harmless when only the valid predecessor can advance.</p>
+                <p>A single conditional update advances only the transaction that still matches the current state.</p>
               </div>
             </div>
+          </div>
+
+          <div class="training-deep-dive">
+            <figure class="training-sequence-card" aria-labelledby="training-sequence-title">
+              <figcaption class="deep-dive-heading">
+                <div>
+                  <p class="eyebrow">Training handoff sequence</p>
+                  <h3 id="training-sequence-title">The queue wakes the controller; it does not carry the 12–24 hour run.</h3>
+                </div>
+                <p>SQS visibility covers the controller handoff and retry window. RDS, Kubernetes, and reconciliation own the long-running lifecycle after the deterministic Job is created or verified.</p>
+              </figcaption>
+
+              <div class="sequence-scroll" tabindex="0" aria-label="Scrollable training request to GPU Job sequence diagram">
+                <div class="sequence-diagram">
+                  <div class="sequence-actors" aria-hidden="true">
+                    <span>Client</span>
+                    <span>Backend API</span>
+                    <span>PostgreSQL</span>
+                    <span>Outbox → SQS</span>
+                    <span>Training Controller</span>
+                    <span>Kubernetes API</span>
+                    <span>GPU Job / S3</span>
+                  </div>
+                  <ol class="sequence-events">
+                    <li class="sequence-event event-1-2"><span>01</span><strong>Request training</strong><small>validate command</small></li>
+                    <li class="sequence-event event-2-3"><span>02</span><strong>Commit QUEUED + OutboxEvent</strong><small>one transaction</small></li>
+                    <li class="sequence-event event-3-4"><span>03</span><strong>Publish wake-up</strong><small>at-least-once</small></li>
+                    <li class="sequence-event event-4-5"><span>04</span><strong>Deliver training_job_id</strong><small>short handoff window</small></li>
+                    <li class="sequence-event event-3-5 event-reverse"><span>05</span><strong>Re-read RDS + claim</strong><small>QUEUED → SCHEDULING</small></li>
+                    <li class="sequence-event event-5-6"><span>06</span><strong>Create / verify deterministic Job</strong><small>idempotent Kubernetes effect</small></li>
+                    <li class="sequence-event event-6-7"><span>07</span><strong>Observe, checkpoint, finalize</strong><small>12–24h execution</small></li>
+                  </ol>
+                </div>
+              </div>
+
+              <div class="handoff-boundary" aria-label="Queue handoff and execution ownership boundary">
+                <div><span>SQS handoff</span><strong>Wake-up · retry · duplicate-safe claim</strong></div>
+                <div><span>Long-running execution</span><strong>RDS intent · Kubernetes observation · S3 checkpoint · reconciler repair</strong></div>
+              </div>
+            </figure>
+
+            <section class="training-state-card" aria-labelledby="training-state-title">
+              <div class="deep-dive-heading state-heading">
+                <div>
+                  <p class="eyebrow">TrainingJob state machine</p>
+                  <h3 id="training-state-title">Business state advances only from a valid predecessor.</h3>
+                </div>
+                <p>Every state change and TrainingJobEvent commit together. Kubernetes completion is observed before the business record becomes terminal.</p>
+              </div>
+
+              <div class="state-mainline" aria-label="Main successful training state path">
+                <span class="state-node state-queued">QUEUED</span>
+                <span class="state-arrow" aria-hidden="true">→</span>
+                <span class="state-node state-scheduling">SCHEDULING</span>
+                <span class="state-arrow" aria-hidden="true">→</span>
+                <span class="state-node state-running">RUNNING</span>
+                <span class="state-arrow" aria-hidden="true">→</span>
+                <span class="state-node state-success">SUCCEEDED</span>
+              </div>
+
+              <div class="state-branches">
+                <div class="state-branch state-failure">
+                  <span>Failure path</span>
+                  <strong>QUEUED / SCHEDULING / RUNNING → FAILED</strong>
+                </div>
+                <div class="state-branch state-cancel">
+                  <span>Cancellation race</span>
+                  <strong>Active state → CANCEL_REQUESTED → terminal observation → CANCELLED · SUCCEEDED · FAILED</strong>
+                </div>
+              </div>
+              <p class="state-footnote">A cancellation request is intent, not an immediate terminal fact: a Job that completed before cancellation was observed can still converge to SUCCEEDED.</p>
+            </section>
           </div>
 
           <blockquote class="systems-quote">
@@ -591,22 +663,41 @@
       </section>
 
       <section id="complexity" class="section-pad section-plain" aria-labelledby="complexity-title">
-        <div class="shell complexity-layout">
-          <div>
-            <p class="eyebrow">07 · Avoiding unnecessary complexity</p>
-            <h2 id="complexity-title">Architecture quality is not measured by the number of technologies adopted.</h2>
-            <p class="complexity-lede">
-              Components were excluded when the requirement or measured bottleneck did not justify
-              the additional state, failure modes, and operator workload.
-            </p>
+        <div class="shell">
+          <div class="complexity-layout">
+            <div>
+              <p class="eyebrow">07 · Avoiding unnecessary complexity</p>
+              <h2 id="complexity-title">Architecture quality is not measured by the number of technologies adopted.</h2>
+              <p class="complexity-lede">
+                Components were excluded when the requirement or measured bottleneck did not justify
+                the additional state, failure modes, and operator workload.
+              </p>
+            </div>
+            <div class="exclusion-list">
+              <article><strong>Redis</strong><span>No demonstrated RDS lookup bottleneck or cache invalidation requirement.</span></article>
+              <article><strong>KEDA</strong><span>The Training Controller already consumes SQS and creates Jobs.</span></article>
+              <article><strong>Knative</strong><span>No scale-to-zero or long-streaming requirement for tabular inference.</span></article>
+              <article><strong>Envoy Gateway</strong><span>ALB, Inference Gateway, and ClusterIP provide the required routing boundary.</span></article>
+              <article><strong>CloudFront</strong><span>No static asset or globally cached download requirement in the platform scope.</span></article>
+            </div>
           </div>
-          <div class="exclusion-list">
-            <article><strong>Redis</strong><span>No demonstrated RDS lookup bottleneck or cache invalidation requirement.</span></article>
-            <article><strong>KEDA</strong><span>The Training Controller already consumes SQS and creates Jobs.</span></article>
-            <article><strong>Knative</strong><span>No scale-to-zero or long-streaming requirement for tabular inference.</span></article>
-            <article><strong>Envoy Gateway</strong><span>ALB, Inference Gateway, and ClusterIP provide the required routing boundary.</span></article>
-            <article><strong>CloudFront</strong><span>No static asset or globally cached download requirement in the platform scope.</span></article>
-          </div>
+
+          <section class="cost-controls" aria-labelledby="cost-controls-title">
+            <div class="cost-controls-heading">
+              <div>
+                <p class="eyebrow">Target design · Cost controls</p>
+                <h3 id="cost-controls-title">Elasticity is bounded by explicit operating rules.</h3>
+              </div>
+              <p>These are architecture guardrails, not production cost measurements. They constrain expensive capacity while preserving a conservative reliability baseline.</p>
+            </div>
+            <div class="cost-controls-grid">
+              <article><span>01</span><strong>Scale GPU nodes to zero</strong><p>No training demand means no standing GPU worker capacity.</p></article>
+              <article><span>02</span><strong>Cap aggregate GPU capacity</strong><p>Karpenter NodePool limits bound the maximum GPU footprint.</p></article>
+              <article><span>03</span><strong>Default to On-Demand</strong><p>The baseline favors predictable long-job continuity over discounted interruption risk.</p></article>
+              <article><span>04</span><strong>Gate Spot adoption</strong><p>Spot is considered only after checkpoint and retry behavior is validated.</p></article>
+              <article><span>05</span><strong>Accept warm serving cost</strong><p>KServe Standard Mode keeps active deployments at one or more replicas to reduce operational complexity.</p></article>
+            </div>
+          </section>
         </div>
       </section>
 

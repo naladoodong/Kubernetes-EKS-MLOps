@@ -666,13 +666,14 @@ def page_capacity(c: canvas.Canvas) -> None:
     rounded_rect(c, 42, 66, 757, 84, fill=WHITE, stroke=LINE, radius=10)
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 9.3)
-    c.drawString(58, 124, "Guardrails make elasticity predictable")
+    c.drawString(58, 124, "Cost controls bound elastic capacity (target design)")
     guards = [
-        "No static GPU replicas",
-        "GPU nodes can scale to zero",
-        "Disruption / consolidation protects long jobs",
-        "Spot only after checkpoint and retry validation",
-        "KEDA not used: the controller already consumes SQS",
+        "GPU nodes scale to zero when idle",
+        "NodePool limit caps aggregate GPUs",
+        "On-Demand is the reliability baseline",
+        "Spot only after checkpoint / retry validation",
+        "Consolidate empty nodes; protect long jobs",
+        "KServe Standard accepts warm-serving cost",
     ]
     yy = 100
     for i, item in enumerate(guards):
@@ -758,91 +759,115 @@ def page_reliability(c: canvas.Canvas) -> None:
         c,
         6,
         "05 / RELIABILITY MECHANICS",
-        "At-least-once delivery requires state transitions that can be repeated safely",
-        "SQS wakes the platform; it is not the job store. PostgreSQL owns business intent, while the Kubernetes API reports execution state.",
+        "Separate the queue handoff from the 12-24 hour training lifecycle",
+        "SQS wakes the controller; it is not the job store. PostgreSQL owns business intent, while Kubernetes reports execution state and S3 holds checkpoints.",
         target=True,
     )
-    # Column 1 - outbox.
-    x1, y1, w, h = 42, 141, 235, 306
-    rounded_rect(c, x1, y1, w, h, fill=WHITE, stroke=LINE, radius=12)
-    badge(c, "1 / TRANSACTIONAL OUTBOX", x1 + 14, y1 + h - 37, bg=BLUE_SOFT, fg=BLUE_DARK, size=6.7)
-    c.setFillColor(INK)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(x1 + 14, y1 + h - 66, "Remove the dual-write gap")
-    flow_node(c, "Business row", x1 + 18, y1 + 177, 88, 48, fill=BLUE_SOFT, stroke=BLUE, fg=BLUE, subtitle="PostgreSQL")
-    flow_node(c, "OutboxEvent", x1 + 129, y1 + 177, 88, 48, fill=BLUE_SOFT, stroke=BLUE, fg=BLUE, subtitle="same transaction")
-    c.setStrokeColor(BLUE)
-    c.setLineWidth(1.5)
-    c.roundRect(x1 + 11, y1 + 166, 213, 70, 9, fill=0, stroke=1)
-    c.setFillColor(BLUE)
-    c.setFont("Helvetica-Bold", 6.6)
-    c.drawCentredString(x1 + w / 2, y1 + 158, "ONE DATABASE COMMIT")
-    flow_node(c, "Outbox publisher", x1 + 25, y1 + 92, 111, 43, fill=AMBER_SOFT, stroke=AMBER, fg=AMBER)
-    flow_node(c, "Amazon SQS", x1 + 151, y1 + 92, 66, 43, fill=AMBER_SOFT, stroke=AMBER, fg=AMBER)
-    arrow(c, x1 + 106, y1 + 177, x1 + 82, y1 + 135, color=BLUE, dashed=True)
-    arrow(c, x1 + 136, y1 + 113, x1 + 151, y1 + 113, color=AMBER)
-    draw_paragraph(c, "Publisher claims unpublished rows with FOR UPDATE SKIP LOCKED.", x1 + 14, y1 + 66, w - 28, size=7.2, leading=9.4, color=MUTED)
-    draw_paragraph(c, "If publish succeeds before published_at, the message may be delivered again.", x1 + 14, y1 + 36, w - 28, font="Helvetica-Bold", size=7.2, leading=9.4, color=RED)
-
-    # Column 2 - conditional update.
-    x2 = 303
-    rounded_rect(c, x2, y1, w, h, fill=NAVY, stroke=NAVY, radius=12)
-    badge(c, "2 / IDEMPOTENT TRANSITION", x2 + 14, y1 + h - 37, bg=HexColor("#283E63"), fg=HexColor("#AFC5FF"), size=6.7)
-    c.setFillColor(WHITE)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(x2 + 14, y1 + h - 66, "Make state progress conditional")
-    code = [
-        "UPDATE training_jobs",
-        "SET status = 'RUNNING'",
-        "WHERE id = :job_id",
-        "  AND status = 'SCHEDULING';",
+    # Sequence strip - the queue owns only the handoff window.
+    rounded_rect(c, 42, 349, 757, 99, fill=WHITE, stroke=LINE, radius=12)
+    badge(c, "SQS HANDOFF VS LONG-RUNNING EXECUTION", 56, 421, bg=AMBER_SOFT, fg=AMBER, size=6.5, height=18)
+    steps = [
+        ("API + RDS", "QUEUED + outbox", BLUE, BLUE_SOFT),
+        ("Outbox -> SQS", "wake-up only", AMBER, AMBER_SOFT),
+        ("Training Ctrl", "re-read + CAS", GREEN, GREEN_SOFT),
+        ("Kubernetes API", "create / verify Job", PURPLE, PURPLE_SOFT),
+        ("GPU Job + S3", "12-24h + checkpoint", PURPLE, PURPLE_SOFT),
     ]
-    rounded_rect(c, x2 + 14, y1 + 169, w - 28, 99, fill=HexColor("#0B1220"), stroke=HexColor("#31405B"), radius=8)
-    c.setFont("Courier-Bold", 8.1)
-    for i, line in enumerate(code):
-        c.setFillColor(HexColor("#D8E4FF") if i != 3 else HexColor("#8DB5FF"))
-        c.drawString(x2 + 28, y1 + 243 - i * 20, line)
+    sx, sy, sw, sh, sg = 56, 371, 127, 38, 19
+    for i, (name, sub, col, soft) in enumerate(steps):
+        flow_node(c, name, sx + i * (sw + sg), sy, sw, sh, fill=soft, stroke=col, fg=col, subtitle=sub, size=7.0)
+        if i < len(steps) - 1:
+            arrow(c, sx + i * (sw + sg) + sw, sy + sh / 2, sx + (i + 1) * (sw + sg) - 4, sy + sh / 2, color=col)
+    c.setFillColor(AMBER)
+    c.setFont("Helvetica-Bold", 6.2)
+    c.drawString(56, 358, "QUEUE HANDOFF / RETRY WINDOW")
+    c.setFillColor(PURPLE)
+    c.drawString(641, 358, "EXECUTION LIFECYCLE")
+
+    # Column 1 - transactional outbox and cleanup policy.
+    y1, h = 142, 185
+    x1, w1 = 42, 235
+    rounded_rect(c, x1, y1, w1, h, fill=WHITE, stroke=LINE, radius=12)
+    badge(c, "1 / OUTBOX + RETENTION", x1 + 14, y1 + h - 34, bg=BLUE_SOFT, fg=BLUE_DARK, size=6.5)
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 10.2)
+    c.drawString(x1 + 14, y1 + h - 60, "Intent and event commit together")
+    flow_node(c, "Business row", x1 + 14, y1 + 81, 90, 42, fill=BLUE_SOFT, stroke=BLUE, fg=BLUE, subtitle="PostgreSQL", size=7.1)
+    flow_node(c, "OutboxEvent", x1 + 130, y1 + 81, 90, 42, fill=BLUE_SOFT, stroke=BLUE, fg=BLUE, subtitle="same transaction", size=7.1)
+    arrow(c, x1 + 104, y1 + 102, x1 + 130, y1 + 102, color=BLUE)
     draw_bullets(
         c,
         [
-            "idempotency_key on the command boundary",
-            "event_id + resource_id in async logs",
-            "deterministic Kubernetes resource names",
-            "retry with backoff; never claim exactly-once",
+            "Published rows: retain 30 days, then cleanup job",
+            "Unpublished rows: never auto-delete",
+            "Retry with backoff; duplicate delivery remains possible",
         ],
-        x2 + 17,
-        y1 + 140,
-        w - 34,
-        size=7.3,
-        leading=9.3,
-        color=WHITE,
-        dot_color=HexColor("#7EA4FF"),
-        gap=4,
+        x1 + 15,
+        y1 + 61,
+        w1 - 30,
+        size=6.8,
+        leading=8.6,
+        gap=3.2,
+        dot_color=BLUE,
     )
 
-    # Column 3 - reconciliation.
-    x3 = 564
-    rounded_rect(c, x3, y1, w, h, fill=WHITE, stroke=LINE, radius=12)
-    badge(c, "3 / RECONCILIATION", x3 + 14, y1 + h - 37, bg=GREEN_SOFT, fg=GREEN, size=6.7)
-    c.setFillColor(INK)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(x3 + 14, y1 + h - 66, "Repair drift, not just events")
-    flow_node(c, "PostgreSQL", x3 + 18, y1 + 188, 83, 49, fill=BLUE_SOFT, stroke=BLUE, fg=BLUE, subtitle="desired state")
-    flow_node(c, "Controller", x3 + 133, y1 + 188, 83, 49, fill=GREEN_SOFT, stroke=GREEN, fg=GREEN, subtitle="periodic loop")
-    arrow(c, x3 + 101, y1 + 213, x3 + 133, y1 + 213, color=GREEN)
-    flow_node(c, "Kubernetes API", x3 + 76, y1 + 111, 94, 49, fill=PURPLE_SOFT, stroke=PURPLE, fg=PURPLE, subtitle="observed state")
-    arrow(c, x3 + 174, y1 + 188, x3 + 139, y1 + 160, color=PURPLE)
-    arrow(c, x3 + 100, y1 + 160, x3 + 62, y1 + 188, color=BLUE, dashed=True)
-    draw_paragraph(c, "A periodic reconciler compares RDS intent with Kubernetes execution and repairs missed creates or stale terminal states.", x3 + 14, y1 + 81, w - 28, size=7.4, leading=9.7, color=MUTED)
-    badge(c, "AT-LEAST-ONCE, SAFELY", x3 + 14, y1 + 22, bg=AMBER_SOFT, fg=AMBER, size=6.8, height=19)
+    # Column 2 - TrainingJob state machine.
+    x2, w2 = 292, 266
+    rounded_rect(c, x2, y1, w2, h, fill=NAVY, stroke=NAVY, radius=12)
+    badge(c, "2 / TRAININGJOB STATE", x2 + 14, y1 + h - 34, bg=HexColor("#283E63"), fg=HexColor("#AFC5FF"), size=6.5)
+    c.setFillColor(WHITE)
+    c.setFont("Helvetica-Bold", 10.2)
+    c.drawString(x2 + 14, y1 + h - 60, "Advance only from a valid predecessor")
+    states = [("QUEUED", BLUE), ("SCHEDULING", PURPLE), ("RUNNING", AMBER), ("SUCCEEDED", GREEN)]
+    nx, ny, nw, nh, ng = x2 + 14, y1 + 88, 53, 37, 9
+    for i, (name, col) in enumerate(states):
+        flow_node(c, name, nx + i * (nw + ng), ny, nw, nh, fill=HexColor("#17243A"), stroke=col, fg=WHITE, size=5.7)
+        if i < len(states) - 1:
+            arrow(c, nx + i * (nw + ng) + nw, ny + nh / 2, nx + (i + 1) * (nw + ng) - 3, ny + nh / 2, color=HexColor("#7EA4FF"))
+    rounded_rect(c, x2 + 14, y1 + 20, w2 - 28, 53, fill=HexColor("#17243A"), stroke=HexColor("#405170"), radius=7)
+    c.setFillColor(HexColor("#AFC5FF"))
+    c.setFont("Helvetica-Bold", 6.1)
+    c.drawString(x2 + 23, y1 + 58, "FAILURE")
+    c.setFillColor(WHITE)
+    c.setFont("Helvetica", 6.3)
+    c.drawString(x2 + 68, y1 + 58, "active state -> FAILED")
+    c.setFillColor(HexColor("#F2CE79"))
+    c.setFont("Helvetica-Bold", 6.1)
+    c.drawString(x2 + 23, y1 + 40, "CANCEL RACE")
+    c.setFillColor(WHITE)
+    c.setFont("Helvetica", 6.1)
+    c.drawString(x2 + 83, y1 + 40, "CANCEL_REQUESTED -> CANCELLED / SUCCEEDED / FAILED")
+    c.setFillColor(HexColor("#AEB9CA"))
+    c.setFont("Helvetica", 5.9)
+    c.drawString(x2 + 23, y1 + 25, "Terminal observation decides the final business state.")
 
-    rounded_rect(c, 42, 65, 757, 53, fill=AMBER_SOFT, stroke=HexColor("#DFC88A"), radius=9)
-    c.setFillColor(AMBER)
-    c.setFont("Helvetica-Bold", 8.4)
-    c.drawString(58, 96, "Failure mode made explicit")
+    # Column 3 - reconciliation is a repair path, not a latency SLO.
+    x3, w3 = 573, 226
+    rounded_rect(c, x3, y1, w3, h, fill=WHITE, stroke=LINE, radius=12)
+    badge(c, "3 / 60s RECONCILER", x3 + 14, y1 + h - 34, bg=GREEN_SOFT, fg=GREEN, size=6.5)
     c.setFillColor(INK)
-    c.setFont("Helvetica", 7.5)
-    c.drawString(58, 78, "SQS success followed by publisher crash can duplicate delivery. The design absorbs it through idempotency, conditional SQL, and reconciliation.")
+    c.setFont("Helvetica-Bold", 10.2)
+    c.drawString(x3 + 14, y1 + h - 60, "Repair and converge")
+    flow_node(c, "RDS intent", x3 + 14, y1 + 83, 78, 42, fill=BLUE_SOFT, stroke=BLUE, fg=BLUE, size=6.8)
+    flow_node(c, "Controller", x3 + 119, y1 + 83, 91, 42, fill=GREEN_SOFT, stroke=GREEN, fg=GREEN, size=6.8)
+    arrow(c, x3 + 92, y1 + 104, x3 + 119, y1 + 104, color=GREEN)
+    flow_node(c, "Kubernetes observation", x3 + 55, y1 + 36, 128, 34, fill=PURPLE_SOFT, stroke=PURPLE, fg=PURPLE, size=6.2)
+    arrow(c, x3 + 164, y1 + 83, x3 + 136, y1 + 70, color=PURPLE)
+    c.setFillColor(MUTED)
+    c.setFont("Helvetica", 6.2)
+    c.drawString(x3 + 14, y1 + 22, "Not an event-latency or user-facing SLO.")
+    c.setFont("Helvetica-Bold", 5.8)
+    c.drawString(x3 + 14, y1 + 9, "Shorter = more polling  |  Longer = more recovery lag")
+
+    # CAS guardrail remains explicit.
+    rounded_rect(c, 42, 65, 757, 54, fill=HexColor("#0B1220"), stroke=HexColor("#31405B"), radius=9)
+    badge(c, "CONDITIONAL TRANSITION", 55, 88, bg=HexColor("#283E63"), fg=HexColor("#AFC5FF"), size=6.1, height=18)
+    c.setFillColor(HexColor("#D8E4FF"))
+    c.setFont("Courier-Bold", 6.8)
+    c.drawString(198, 94, "UPDATE training_jobs SET status='RUNNING' WHERE id=:id AND status='SCHEDULING';")
+    c.setFillColor(HexColor("#8BD5B5"))
+    c.setFont("Helvetica-Bold", 6.4)
+    c.drawString(198, 78, "Only rows_affected = 1 advances; deterministic Job names absorb duplicate effects.")
     footer(c, 6)
     c.showPage()
 
