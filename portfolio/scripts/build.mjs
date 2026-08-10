@@ -38,6 +38,16 @@ await copyFile(
   path.join(outputDir, "assets", "ArgMax_Mini_System_Architecture_and_Design.pdf")
 );
 
+await copyFile(
+  path.join(
+    repositoryRoot,
+    "docs",
+    "portfolio",
+    "ArgMax_Mini_AWS_EKS_Architecture_Case_Study.pdf"
+  ),
+  path.join(outputDir, "assets", "ArgMax_Mini_AWS_EKS_Architecture_Case_Study.pdf")
+);
+
 await writeFile(path.join(outputDir, ".nojekyll"), "", "utf8");
 
 console.log(`Built static portfolio in ${outputDir}`);
