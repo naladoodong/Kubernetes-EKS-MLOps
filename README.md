@@ -1,6 +1,10 @@
-# ArgMax Mini
+# ArgMax Mini — AWS EKS-based MLOps Platform Architecture
 
-> **Architecture Portfolio:** Expected URL after the first GitHub Pages deployment: `https://naladoodong.github.io/Kubernetes-EKS-MLOps/`
+> **Architecture Case Study · Target Architecture + Limited API Implementation**
+>
+> **Role:** System Architecture & Backend Design
+>
+> **Portfolio:** `https://naladoodong.github.io/Kubernetes-EKS-MLOps/`
 
 The portfolio source is isolated in [`portfolio/`](portfolio/) and deploys through a dedicated GitHub Pages workflow. It presents the target EKS architecture and the repository-backed implementation scope as separate claims.
 

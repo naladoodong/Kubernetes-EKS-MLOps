@@ -304,11 +304,11 @@ def page_cover(c: canvas.Canvas) -> None:
     c.drawString(64, 552, "ARGMAX MINI")
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 7.3)
-    c.drawString(42, 507, "ARCHITECTURE PORTFOLIO / 2026")
+    c.drawString(42, 507, "ARCHITECTURE CASE STUDY / 2026")
     c.setFillColor(INK)
-    c.setFont("Helvetica-Bold", 35)
-    c.drawString(42, 445, "AWS EKS")
-    c.drawString(42, 404, "Architecture Case Study")
+    c.setFont("Helvetica-Bold", 31)
+    c.drawString(42, 445, "AWS EKS-based MLOps")
+    c.drawString(42, 407, "Platform Architecture")
     c.setFillColor(BLUE)
     c.rect(42, 378, 74, 4, fill=1, stroke=0)
 
@@ -344,9 +344,23 @@ def page_cover(c: canvas.Canvas) -> None:
         height=21,
         pad=10,
     )
+    label(c, "ROLE", 42, 178, BLUE)
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 9.5)
+    c.drawString(42, 159, "System Architecture & Backend Design")
+    draw_paragraph(
+        c,
+        "Designed the target architecture and reliability model; implemented the limited API/data foundation.",
+        42,
+        140,
+        420,
+        size=7.5,
+        leading=10,
+        color=MUTED,
+    )
     c.setFillColor(MUTED)
-    c.setFont("Helvetica", 8)
-    c.drawString(42, 177, "DevOps / SRE / Infrastructure Engineering Portfolio")
+    c.setFont("Helvetica", 7)
+    c.drawString(42, 111, "DevOps / SRE / Infrastructure Engineering Portfolio")
 
     # Abstract control-plane / data-plane motif.
     c.setFillColor(HexColor("#6F95FF"))
@@ -1253,7 +1267,7 @@ def build_pdf(output: Path, repo_root: Path) -> None:
     validate_sources(repo_root)
     output.parent.mkdir(parents=True, exist_ok=True)
     c = canvas.Canvas(str(output), pagesize=landscape(A4), pageCompression=1)
-    c.setTitle("ArgMax Mini AWS EKS Architecture Case Study")
+    c.setTitle("ArgMax Mini - AWS EKS-based MLOps Platform Architecture")
     c.setAuthor("ArgMax Mini Architecture Portfolio")
     c.setSubject("Evidence-led target architecture for an AWS EKS ML platform")
     c.setKeywords("AWS, EKS, Kubernetes, Karpenter, SRE, DevOps, MLOps, architecture")

@@ -3,24 +3,24 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ArgMax Mini — Kubernetes MLOps Architecture Case Study</title>
+    <title>AWS EKS-based MLOps Platform Architecture — ArgMax Mini</title>
     <meta
       name="description"
-      content="An EKS-based MLOps architecture for 2 GB tabular datasets, 12–24 hour GPU training, reliable asynchronous execution, model versioning, and online inference."
+      content="An AWS EKS-based MLOps platform architecture case study with an explicit target-design boundary and limited FastAPI/PostgreSQL implementation evidence."
     >
     <meta name="theme-color" content="#f5f4ef">
     <link rel="canonical" href="https://naladoodong.github.io/Kubernetes-EKS-MLOps/">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="ArgMax Mini — MLOps Architecture Case Study">
+    <meta property="og:title" content="AWS EKS-based MLOps Platform Architecture — ArgMax Mini">
     <meta
       property="og:description"
-      content="Designed an EKS-based MLOps platform for large tabular datasets, long-running GPU training, model versioning, and online inference."
+      content="Architecture case study covering target AWS/EKS design, reliability mechanisms, and a limited FastAPI/PostgreSQL implementation foundation."
     >
     <meta property="og:url" content="https://naladoodong.github.io/Kubernetes-EKS-MLOps/">
     <meta property="og:image" content="https://naladoodong.github.io/Kubernetes-EKS-MLOps/assets/og.png">
     <meta property="og:image:alt" content="ArgMax Mini architecture case study preview">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="ArgMax Mini — MLOps Architecture Case Study">
+    <meta name="twitter:title" content="AWS EKS-based MLOps Platform Architecture — ArgMax Mini">
     <meta
       name="twitter:description"
       content="EKS, long-running GPU workloads, transactional outbox, reconciliation, model lineage, and KServe."
@@ -59,13 +59,30 @@
         <div class="shell hero-grid">
           <div class="hero-copy">
             <p class="eyebrow">Architecture case study · 2026</p>
-            <h1 id="hero-title">ArgMax Mini</h1>
-            <p class="hero-subtitle">Kubernetes-based MLOps Platform Architecture</p>
+            <p class="hero-project-name">ArgMax Mini</p>
+            <h1 id="hero-title">
+              <span class="headline-line"><span class="headline-nowrap">AWS EKS-based</span> MLOps</span>
+              <span class="headline-line">Platform Architecture</span>
+            </h1>
+            <div class="hero-positioning" aria-label="Project type and implementation scope">
+              <span>Architecture Case Study</span>
+              <span>Target Architecture + Limited API Implementation</span>
+            </div>
             <p class="hero-lede">
               Designed an EKS-based MLOps platform for large tabular datasets, long-running GPU
               training, model versioning, and online inference. The architecture separates business
               state from execution and treats failure recovery as a first-class design concern.
             </p>
+            <div class="hero-role" aria-label="My role and contribution">
+              <p class="hero-role-label">My Role</p>
+              <div>
+                <strong>System Architecture &amp; Backend Design</strong>
+                <p>
+                  I designed the target AWS/EKS architecture, ADRs, data model, state transitions,
+                  and reliability mechanisms, and implemented the limited FastAPI/PostgreSQL API foundation.
+                </p>
+              </div>
+            </div>
             <div class="hero-actions" aria-label="Case study actions">
               <a class="button button-primary" href="#architecture">Explore architecture</a>
               <a class="button button-secondary" href="./assets/ArgMax_Mini_AWS_EKS_Architecture_Case_Study.pdf">
@@ -85,7 +102,7 @@
           <aside class="hero-brief" aria-label="Case study scope">
             <div class="brief-status">
               <span class="status-dot" aria-hidden="true"></span>
-              Target architecture
+              Architecture case study
             </div>
             <p class="brief-kicker">Core design thesis</p>
             <p class="brief-quote">
