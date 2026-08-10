@@ -47,7 +47,7 @@
           <a href="#challenges">Challenges</a>
           <a href="#architecture">Architecture</a>
           <a href="#flows">Flows</a>
-          <a href="#decisions">Decisions</a>
+          <a href="#decisions">Decisions &amp; Trade-offs</a>
           <a href="#scope">Scope</a>
           <a class="nav-cta" href="./assets/ArgMax_Mini_AWS_EKS_Architecture_Case_Study.pdf">PDF</a>
         </nav>
@@ -132,19 +132,19 @@
         <div class="shell signal-grid" aria-label="Architecture requirements">
           <div class="signal">
             <strong>2 GB</strong>
-            <span>CSV / XLSX direct upload</span>
+            <span>Direct dataset upload</span>
           </div>
           <div class="signal">
             <strong>12–24h</strong>
             <span>GPU training lifecycle</span>
           </div>
           <div class="signal">
-            <strong>14</strong>
-            <span>RDB entities with lineage</span>
+            <strong class="signal-value-entity">14 entities</strong>
+            <span>Upload-to-deployment lineage</span>
           </div>
           <div class="signal">
-            <strong>32</strong>
-            <span>Accepted architecture decisions</span>
+            <strong class="signal-value-long">AT-LEAST-ONCE</strong>
+            <span>Outbox + idempotency + reconciliation</span>
           </div>
         </div>
       </section>
@@ -207,8 +207,8 @@
               <h2 id="architecture-title">Control intent. Isolate execution.</h2>
             </div>
             <p>
-              Public traffic reaches only the Backend API and Inference Gateway. The EKS control
-              plane records intent in RDS; data-plane Jobs and KServe perform the expensive work.
+              Public traffic reaches only the Backend API and Inference Gateway. Control-plane
+              workloads persist business intent in RDS; data-plane workloads perform the expensive execution.
             </p>
           </div>
 
@@ -576,13 +576,18 @@
         <div class="shell">
           <div class="section-heading heading-grid">
             <div>
-              <p class="eyebrow">06 · Architecture decisions</p>
+              <p class="eyebrow">06 · Architecture decisions &amp; trade-offs</p>
               <h2 id="decisions-title">Decisions carry consequences.</h2>
             </div>
             <p>
-              Eight decisions summarize the 32 accepted ADRs. Every choice includes the constraint it
-              addresses and the operational responsibility it introduces.
+              Eight adopted decisions show how requirements become operating responsibilities.
+              Alternatives deferred for lack of workload evidence remain visible below.
             </p>
+          </div>
+
+          <div class="decision-subheading">
+            <p class="eyebrow">Adopted decisions</p>
+            <p>Architecture complexity is introduced only when backed by workload requirements.</p>
           </div>
 
           <div class="decision-grid">
@@ -659,44 +664,42 @@
               </dl>
             </article>
           </div>
-        </div>
-      </section>
 
-      <section id="complexity" class="section-pad section-plain" aria-labelledby="complexity-title">
-        <div class="shell">
-          <div class="complexity-layout">
-            <div>
-              <p class="eyebrow">07 · Avoiding unnecessary complexity</p>
-              <h2 id="complexity-title">Architecture quality is not measured by the number of technologies adopted.</h2>
-              <p class="complexity-lede">
-                Components were excluded when the requirement or measured bottleneck did not justify
-                the additional state, failure modes, and operator workload.
-              </p>
-            </div>
-            <div class="exclusion-list">
-              <article><strong>Redis</strong><span>No demonstrated RDS lookup bottleneck or cache invalidation requirement.</span></article>
-              <article><strong>KEDA</strong><span>The Training Controller already consumes SQS and creates Jobs.</span></article>
-              <article><strong>Knative</strong><span>No scale-to-zero or long-streaming requirement for tabular inference.</span></article>
-              <article><strong>Envoy Gateway</strong><span>ALB, Inference Gateway, and ClusterIP provide the required routing boundary.</span></article>
-              <article><strong>CloudFront</strong><span>No static asset or globally cached download requirement in the platform scope.</span></article>
-            </div>
-          </div>
-
-          <section class="cost-controls" aria-labelledby="cost-controls-title">
-            <div class="cost-controls-heading">
+          <section id="complexity" class="decision-subsection" aria-labelledby="complexity-title">
+            <div class="complexity-layout">
               <div>
-                <p class="eyebrow">Target design · Cost controls</p>
-                <h3 id="cost-controls-title">Elasticity is bounded by explicit operating rules.</h3>
+                <p class="eyebrow">Deliberately not adopted</p>
+                <h3 id="complexity-title">Architecture quality is not measured by the number of technologies adopted.</h3>
+                <p class="complexity-lede">
+                  Components were excluded when the requirement or measured bottleneck did not justify
+                  the additional state, failure modes, and operator workload.
+                </p>
               </div>
-              <p>These are architecture guardrails, not production cost measurements. They constrain expensive capacity while preserving a conservative reliability baseline.</p>
+              <div class="exclusion-list">
+                <article><strong>Redis</strong><span>No demonstrated RDS lookup bottleneck or cache invalidation requirement.</span></article>
+                <article><strong>KEDA</strong><span>The Training Controller already consumes SQS and creates Jobs.</span></article>
+                <article><strong>Knative</strong><span>No scale-to-zero or long-streaming requirement for tabular inference.</span></article>
+                <article><strong>Envoy Gateway</strong><span>ALB, Inference Gateway, and ClusterIP provide the required routing boundary.</span></article>
+                <article><strong>CloudFront</strong><span>No static asset or globally cached download requirement in the platform scope.</span></article>
+              </div>
             </div>
-            <div class="cost-controls-grid">
-              <article><span>01</span><strong>Scale GPU nodes to zero</strong><p>No training demand means no standing GPU worker capacity.</p></article>
-              <article><span>02</span><strong>Cap aggregate GPU capacity</strong><p>Karpenter NodePool limits bound the maximum GPU footprint.</p></article>
-              <article><span>03</span><strong>Default to On-Demand</strong><p>The baseline favors predictable long-job continuity over discounted interruption risk.</p></article>
-              <article><span>04</span><strong>Gate Spot adoption</strong><p>Spot is considered only after checkpoint and retry behavior is validated.</p></article>
-              <article><span>05</span><strong>Accept warm serving cost</strong><p>KServe Standard Mode keeps active deployments at one or more replicas to reduce operational complexity.</p></article>
-            </div>
+
+            <section class="cost-controls" aria-labelledby="cost-controls-title">
+              <div class="cost-controls-heading">
+                <div>
+                  <p class="eyebrow">Target design · Cost controls</p>
+                  <h3 id="cost-controls-title">Elasticity is bounded by explicit operating rules.</h3>
+                </div>
+                <p>These are architecture guardrails, not production cost measurements. They constrain expensive capacity while preserving a conservative reliability baseline.</p>
+              </div>
+              <div class="cost-controls-grid">
+                <article><span>01</span><strong>Scale GPU nodes to zero</strong><p>No training demand means no standing GPU worker capacity.</p></article>
+                <article><span>02</span><strong>Cap aggregate GPU capacity</strong><p>Karpenter NodePool limits bound the maximum GPU footprint.</p></article>
+                <article><span>03</span><strong>Default to On-Demand</strong><p>The baseline favors predictable long-job continuity over discounted interruption risk.</p></article>
+                <article><span>04</span><strong>Gate Spot adoption</strong><p>Spot is considered only after checkpoint and retry behavior is validated.</p></article>
+                <article><span>05</span><strong>Accept warm serving cost</strong><p>KServe Standard Mode keeps active deployments at one or more replicas to reduce operational complexity.</p></article>
+              </div>
+            </section>
           </section>
         </div>
       </section>
@@ -705,7 +708,7 @@
         <div class="shell">
           <div class="scope-heading">
             <div>
-              <p class="eyebrow">08 · Designed vs implemented</p>
+              <p class="eyebrow">07 · Designed vs implemented</p>
               <h2 id="scope-title">Scope is part of the architecture.</h2>
             </div>
             <p>
@@ -768,7 +771,7 @@
         <div class="shell">
           <div class="section-heading heading-grid compact-heading">
             <div>
-              <p class="eyebrow">09 · Technology stack</p>
+              <p class="eyebrow">08 · Technology stack</p>
               <h2 id="stack-title">Tools follow system boundaries.</h2>
             </div>
             <p>A compact view of the target stack. Scope status remains governed by the section above.</p>
@@ -806,7 +809,7 @@
       <section id="materials" class="section-pad materials-section" aria-labelledby="materials-title">
         <div class="shell materials-grid">
           <div>
-            <p class="eyebrow">10 · Detailed materials</p>
+            <p class="eyebrow">09 · Detailed materials</p>
             <h2 id="materials-title">Continue into the evidence.</h2>
             <p>
               The portfolio is the entry point. The case study, detailed design PDF, and source

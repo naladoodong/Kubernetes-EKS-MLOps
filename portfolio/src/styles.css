@@ -482,6 +482,16 @@ h3 {
   line-height: 1;
 }
 
+.signal .signal-value-long {
+  font-size: clamp(0.92rem, 1.45vw, 1.2rem);
+  letter-spacing: 0.015em;
+  line-height: 1.1;
+}
+
+.signal .signal-value-entity {
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+}
+
 .signal span {
   color: var(--ink-soft);
   font-size: 0.8rem;
@@ -1345,6 +1355,28 @@ h3 {
   gap: 18px;
 }
 
+.decision-subheading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.decision-subheading .eyebrow,
+.decision-subheading p {
+  margin: 0;
+}
+
+.decision-subheading > p:last-child {
+  max-width: 520px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  text-align: right;
+}
+
 .decision-card {
   padding: 30px;
   background: var(--surface);
@@ -1389,6 +1421,13 @@ h3 {
   font-weight: 700;
 }
 
+.decision-subsection {
+  padding-top: clamp(72px, 9vw, 112px);
+  margin-top: clamp(82px, 11vw, 136px);
+  border-top: 1px solid var(--line-strong);
+  scroll-margin-top: 88px;
+}
+
 .complexity-layout {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(420px, 1.2fr);
@@ -1396,7 +1435,7 @@ h3 {
   align-items: start;
 }
 
-.complexity-layout h2 {
+.complexity-layout h3 {
   font-size: clamp(2.1rem, 4.4vw, 3.7rem);
 }
 
@@ -2049,6 +2088,16 @@ h3 {
 
   .decision-card dl div {
     grid-template-columns: 68px 1fr;
+  }
+
+  .decision-subheading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .decision-subheading > p:last-child {
+    text-align: left;
   }
 
   .exclusion-list article {
