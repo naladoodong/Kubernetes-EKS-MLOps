@@ -129,7 +129,7 @@
           </aside>
         </div>
 
-        <div class="shell signal-grid" aria-label="Architecture requirements">
+        <div id="architecture-requirements" class="shell signal-grid" aria-label="Architecture requirements">
           <div class="signal">
             <strong>2 GB</strong>
             <span>Direct dataset upload</span>
@@ -144,7 +144,7 @@
           </div>
           <div class="signal">
             <strong class="signal-value-long">AT-LEAST-ONCE</strong>
-            <span>Outbox + idempotency + reconciliation</span>
+            <span>Delivery with outbox, idempotency &amp; reconciliation</span>
           </div>
         </div>
       </section>
@@ -415,32 +415,89 @@
                 <p>SQS visibility covers the controller handoff and retry window. RDS, Kubernetes, and reconciliation own the long-running lifecycle after the deterministic Job is created or verified.</p>
               </figcaption>
 
-              <div class="sequence-scroll" tabindex="0" aria-label="Scrollable training request to GPU Job sequence diagram">
+              <div class="sequence-scroll" tabindex="0" aria-label="Scrollable training handoff sequence diagram with nine participants">
                 <div class="sequence-diagram">
-                  <div class="sequence-actors" aria-hidden="true">
+                  <div class="sequence-participants" aria-label="Sequence participants">
                     <span>Client</span>
                     <span>Backend API</span>
                     <span>PostgreSQL</span>
-                    <span>Outbox → SQS</span>
+                    <span>Outbox Publisher</span>
+                    <span>Amazon SQS</span>
                     <span>Training Controller</span>
                     <span>Kubernetes API</span>
-                    <span>GPU Job / S3</span>
+                    <span>GPU Training Job</span>
+                    <span>Amazon S3</span>
                   </div>
-                  <ol class="sequence-events">
-                    <li class="sequence-event event-1-2"><span>01</span><strong>Request training</strong><small>validate command</small></li>
-                    <li class="sequence-event event-2-3"><span>02</span><strong>Commit QUEUED + OutboxEvent</strong><small>one transaction</small></li>
-                    <li class="sequence-event event-3-4"><span>03</span><strong>Publish wake-up</strong><small>at-least-once</small></li>
-                    <li class="sequence-event event-4-5"><span>04</span><strong>Deliver training_job_id</strong><small>short handoff window</small></li>
-                    <li class="sequence-event event-3-5 event-reverse"><span>05</span><strong>Re-read RDS + claim</strong><small>QUEUED → SCHEDULING</small></li>
-                    <li class="sequence-event event-5-6"><span>06</span><strong>Create / verify deterministic Job</strong><small>idempotent Kubernetes effect</small></li>
-                    <li class="sequence-event event-6-7"><span>07</span><strong>Observe, checkpoint, finalize</strong><small>12–24h execution</small></li>
-                  </ol>
+
+                  <div class="sequence-body">
+                    <div class="sequence-lifelines" aria-hidden="true">
+                      <span></span><span></span><span></span><span></span><span></span>
+                      <span></span><span></span><span></span><span></span>
+                    </div>
+
+                    <ol class="sequence-messages">
+                      <li class="sequence-message message-1-2">
+                        <div class="message-arrow arrow-right"><span><b>01</b> Create training request</span></div>
+                        <span class="sr-only">Client to Backend API: create training request.</span>
+                      </li>
+                      <li class="sequence-message message-2-3">
+                        <div class="message-arrow arrow-right"><span><b>02</b> Commit TrainingJob + OutboxEvent</span><small>one transaction</small></div>
+                        <span class="sr-only">Backend API to PostgreSQL: commit TrainingJob and OutboxEvent in one transaction.</span>
+                      </li>
+                      <li class="sequence-message message-4-3">
+                        <div class="message-arrow arrow-left"><span><b>03</b> Claim unpublished event</span></div>
+                        <span class="sr-only">Outbox Publisher to PostgreSQL: claim unpublished event.</span>
+                      </li>
+                      <li class="sequence-message message-4-5">
+                        <div class="message-arrow arrow-right"><span><b>04</b> Publish wake-up</span><small>at-least-once</small></div>
+                        <span class="sr-only">Outbox Publisher to Amazon SQS: publish wake-up message at least once.</span>
+                      </li>
+                      <li class="sequence-message message-5-6">
+                        <div class="message-arrow arrow-right"><span><b>05</b> Receive training_job_id</span></div>
+                        <span class="sr-only">Amazon SQS to Training Controller: deliver the training job identifier.</span>
+                      </li>
+                      <li class="sequence-message message-6-3">
+                        <div class="message-arrow arrow-left"><span><b>06</b> Re-read intent + conditional claim</span><small>QUEUED → SCHEDULING</small></div>
+                        <span class="sr-only">Training Controller to PostgreSQL: re-read durable intent and conditionally claim QUEUED to SCHEDULING.</span>
+                      </li>
+                      <li class="sequence-message message-6-7">
+                        <div class="message-arrow arrow-right"><span><b>07</b> Create / verify deterministic Job</span><small>training-{training_job_id}</small></div>
+                        <span class="sr-only">Training Controller to Kubernetes API: create or verify the deterministic training Job.</span>
+                      </li>
+                      <li class="sequence-message message-6-5">
+                        <div class="message-arrow arrow-left message-ack"><span><b>08</b> DeleteMessage</span><small>after durable handoff</small></div>
+                        <span class="sr-only">Training Controller to Amazon SQS: delete the message after the deterministic Job is durably created or verified.</span>
+                      </li>
+
+                      <li id="training-execution-boundary" class="sequence-phase" aria-label="Execution ownership boundary">
+                        <span>SQS handoff complete</span>
+                        <strong>12–24 hour training continues independently</strong>
+                      </li>
+
+                      <li class="sequence-message message-7-8">
+                        <div class="message-arrow arrow-right"><span><b>09</b> Start GPU execution</span><small>12–24h lifecycle</small></div>
+                        <span class="sr-only">Kubernetes API to GPU Training Job: start the long-running GPU execution.</span>
+                      </li>
+                      <li class="sequence-message message-8-9">
+                        <div class="message-arrow arrow-right"><span><b>10</b> Write checkpoint + artifact</span></div>
+                        <span class="sr-only">GPU Training Job to Amazon S3: write checkpoints and the final artifact.</span>
+                      </li>
+                      <li class="sequence-message message-7-6">
+                        <div class="message-arrow arrow-left"><span><b>11</b> Observe terminal Job state</span></div>
+                        <span class="sr-only">Kubernetes API to Training Controller: expose the terminal Kubernetes Job state for observation.</span>
+                      </li>
+                      <li class="sequence-message message-6-3 sequence-message-final">
+                        <div class="message-arrow arrow-left"><span><b>12</b> Converge final TrainingJob state</span><small>SUCCEEDED · FAILED · CANCELLED</small></div>
+                        <span class="sr-only">Training Controller to PostgreSQL: converge the final TrainingJob state.</span>
+                      </li>
+                    </ol>
+                  </div>
                 </div>
               </div>
 
-              <div class="handoff-boundary" aria-label="Queue handoff and execution ownership boundary">
-                <div><span>SQS handoff</span><strong>Wake-up · retry · duplicate-safe claim</strong></div>
-                <div><span>Long-running execution</span><strong>RDS intent · Kubernetes observation · S3 checkpoint · reconciler repair</strong></div>
+              <div class="sequence-notes">
+                <p>SQS visibility covers controller handoff, not the full training execution.</p>
+                <p>The queue message is deleted after the deterministic Kubernetes Job is durably created or verified.</p>
               </div>
             </figure>
 
@@ -858,8 +915,7 @@
     <footer class="site-footer">
       <div class="shell footer-inner">
         <div>
-          <strong>ArgMax Mini</strong>
-          <p>Kubernetes-based MLOps Platform Architecture</p>
+          <strong>ArgMax Mini · AWS EKS Architecture Case Study</strong>
         </div>
         <p>Architecture case study · <span id="current-year">2026</span></p>
       </div>
