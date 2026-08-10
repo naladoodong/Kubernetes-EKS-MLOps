@@ -1,0 +1,92 @@
+flowchart LR
+    subgraph USERS["Users"]
+        EU["End User"]
+        MLE["ML Engineer"]
+        DA["Data Analyst"]
+        PO["Platform Operator"]
+    end
+
+    subgraph EDGE["AWS Edge"]
+        DNS["Route 53"]
+        WAF["AWS WAF"]
+        ALB["Application Load Balancer"]
+
+        DNS --> WAF --> ALB
+    end
+
+    subgraph EKS["Amazon EKS"]
+        API["Backend API"]
+        PUB["Outbox Publisher"]
+        DPC["Dataset Processing Controller"]
+        TC["Training Controller"]
+        DC["Deployment Controller"]
+        IG["Inference Gateway"]
+
+        DPJ["Dataset Processing Job"]
+        TJ["GPU Training Job<br/>XGBoost CUDA"]
+        KS["KServe<br/>XGBoost CPU Runtime<br/>cluster-local"]
+        MLF["MLflow"]
+    end
+
+    subgraph DATA["AWS Managed Data & Messaging"]
+        DB["Amazon RDS PostgreSQL<br/>Business State & Execution Intent"]
+        SQ["Amazon SQS<br/>Dataset / Training Queues<br/>Wake-up Signal"]
+
+        subgraph S3["Amazon S3"]
+            DS["Dataset Storage<br/>Original / Processed Parquet"]
+            ART["ML Artifact Storage<br/>Checkpoints / Models"]
+            INF["Inference Analytics<br/>InferenceLog Parquet"]
+        end
+
+        GLUE["Glue Data Catalog"]
+        ATH["Athena"]
+    end
+
+    subgraph OBS["Observability"]
+        PG["Prometheus / Grafana"]
+        CW["CloudWatch"]
+    end
+
+    EU --> DNS
+    ALB --> API
+    ALB --> IG
+
+    API <--> DB
+    PUB <--> DB
+    PUB -->|"at-least-once publish"| SQ
+
+    SQ -->|"wake-up"| DPC
+    SQ -->|"wake-up"| TC
+
+    DPC <--> DB
+    DPC -->|"create / reconcile"| DPJ
+    DPJ -->|"processed dataset"| DS
+
+    TC <--> DB
+    TC -->|"create / reconcile"| TJ
+    DS -->|"processed data"| TJ
+    TJ -->|"checkpoint / model artifact"| ART
+    TJ -->|"experiment metrics"| MLF
+
+    DC <--> DB
+    DC -->|"create / reconcile"| KS
+
+    IG -->|"metadata / authorization"| DB
+    IG -->|"synchronous inference"| KS
+    IG -->|"validated inference analytics"| INF
+    ART -->|"load model artifact"| KS
+
+    EU -.->|"Presigned Direct Upload ≤2 GB"| DS
+
+    DS --> GLUE
+    INF --> GLUE
+    GLUE --> ATH
+
+    MLE --> MLF
+    MLE --> ATH
+    DA --> ATH
+    PO --> PG
+    PO --> CW
+
+    EKS -.->|"metrics"| PG
+    EKS -.->|"logs / AWS metrics"| CW

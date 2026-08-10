@@ -1,0 +1,73 @@
+---
+config:
+  layout: elk
+---
+erDiagram
+    direction LR
+    
+    USERS {
+        uuid id PK
+        varchar email
+    }
+
+    DATASETS {
+        uuid id PK
+        uuid user_id FK
+        varchar name
+        text description
+        timestamptz deleted_at
+    }
+
+    DATASET_VERSIONS {
+        uuid id PK
+        uuid dataset_id FK
+        integer version_number
+        varchar original_filename
+        varchar file_format
+        bigint size_bytes
+        text original_storage_uri
+        text processed_storage_uri
+        varchar checksum
+        bigint row_count
+        integer column_count
+        varchar status
+        varchar error_code
+    }
+
+    DATASET_COLUMNS {
+        uuid id PK
+        uuid dataset_version_id FK
+        varchar name
+        integer ordinal_position
+        varchar data_type
+        boolean is_nullable
+        bigint null_count
+        bigint distinct_count
+    }
+
+    UPLOAD_SESSIONS {
+        uuid id PK
+        uuid dataset_version_id FK
+        varchar status
+        text storage_key
+        text upload_id
+        bigint expected_size_bytes
+        varchar expected_checksum
+        timestamptz expires_at
+        timestamptz completed_at
+        timestamptz aborted_at
+        varchar error_code
+    }
+
+    TRAINING_JOBS {
+        uuid id PK
+        uuid dataset_version_id FK
+        uuid model_id FK
+        varchar status
+    }
+
+    USERS ||--o{ DATASETS : owns
+    DATASETS ||--o{ DATASET_VERSIONS : versions
+    DATASET_VERSIONS ||--o{ DATASET_COLUMNS : schema
+    DATASET_VERSIONS ||--o{ UPLOAD_SESSIONS : upload_attempts
+    DATASET_VERSIONS ||--o{ TRAINING_JOBS : training_input

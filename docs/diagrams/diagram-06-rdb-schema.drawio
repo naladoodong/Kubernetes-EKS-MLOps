@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-08-07T00:00:00.000Z" agent="Codex" version="30.0.1" type="device">
+  <diagram id="diagram-06" name="RDB Schema ERD">
+    <mxGraphModel dx="1800" dy="1250" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1250" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;b&gt;ArgMax Mini - RDB Schema (ERD) (Diagram 6)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=28;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="180" y="15" width="1440" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="data-band" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#F3FAF4;fillOpacity=22;strokeColor=#4D9461;strokeWidth=1.3;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="75" width="1760" height="345" as="geometry" />
+        </mxCell>
+        <mxCell id="data-label" value="&lt;b&gt;DATA + UPLOAD&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#176B2C;" vertex="1" parent="1">
+          <mxGeometry x="40" y="85" width="250" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="training-band" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#F5F9FF;fillOpacity=20;strokeColor=#2F6BFF;strokeWidth=1.3;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="435" width="1760" height="405" as="geometry" />
+        </mxCell>
+        <mxCell id="training-label" value="&lt;b&gt;TRAINING + PROVENANCE&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#174EA6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="445" width="350" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="publish-band" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FAF7FF;fillOpacity=18;strokeColor=#8B5CF6;strokeWidth=1.3;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="855" width="1760" height="375" as="geometry" />
+        </mxCell>
+        <mxCell id="publish-label" value="&lt;b&gt;PUBLICATION + DEPLOYMENT + OPERATIONS&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#5B21B6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="865" width="500" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="users" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;users&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; email" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="130" width="290" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="datasets" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;datasets&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; user_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; name&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; deleted_at" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="130" width="290" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="dataset_versions" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;dataset_versions&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; dataset_id&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;UK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; version_number&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; original_filename&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; file_format&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; original_storage_uri&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; processed_storage_uri&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; status&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; error_code" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="105" width="300" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="dataset_columns" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;dataset_columns&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; dataset_version_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; name&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;UK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; ordinal_position&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; data_type&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; statistics_json" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="125" width="300" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="upload_sessions" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;upload_sessions&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; dataset_version_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; status&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; storage_key&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; upload_method&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; upload_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; expires_at&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; error_code&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; error_message" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="105" width="320" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="audit_logs" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;audit_logs&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; actor_user_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; actor_type&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; action&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; resource_type&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; resource_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; result&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; error_code&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; occurred_at" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FAF7FF;strokeColor=#8B5CF6;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="495" width="290" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="models" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;models&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; user_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; name&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; deleted_at" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="495" width="290" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="training_jobs" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;training_jobs&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; user_id&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; model_id&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; dataset_version_id&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; target_column_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; status&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; algorithm&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; hyperparameters&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; requested_gpu_count&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;UK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; idempotency_key&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; mlflow_run_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; cancel_requested_at&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; error_code&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; updated_at" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="465" width="300" height="355" as="geometry" />
+        </mxCell>
+        <mxCell id="training_job_events" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;training_job_events&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; training_job_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; event_type&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; from_status&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; to_status&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; message&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; metadata_json&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; occurred_at" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="495" width="300" height="265" as="geometry" />
+        </mxCell>
+        <mxCell id="training_checkpoints" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;training_checkpoints&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; training_job_id&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;UK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; sequence_number&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; storage_uri&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; checksum&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; is_resumable" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="495" width="320" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="outbox_events" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;outbox_events&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; aggregate_type&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; aggregate_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; event_type&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; payload_json&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; idempotency_key&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; published_at&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; retry_count&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; next_attempt_at" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FAF7FF;strokeColor=#8B5CF6;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="915" width="290" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="erd-note" value="&lt;b&gt;Notation&lt;/b&gt;&lt;br&gt;&lt;b&gt;PK&lt;/b&gt; primary key - &lt;b&gt;FK&lt;/b&gt; foreign key - &lt;b&gt;UK&lt;/b&gt; unique business key&lt;br&gt;&lt;br&gt;Shown consistently: keys, business identifiers, lifecycle/status metadata.&lt;br&gt;Routine timestamps are omitted.&lt;br&gt;&lt;br&gt;&lt;b&gt;ModelVersion checksum source:&lt;/b&gt; S3 manifest (no DB checksum column)." style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.3;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=17;fontColor=#334155;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="925" width="290" height="245" as="geometry" />
+        </mxCell>
+        <mxCell id="model_versions" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;model_versions&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; model_id&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; training_job_id&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;UK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; version_number&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;UK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; candidate_number&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; status&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; artifact_uri&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; artifact_format&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; metrics_json&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; mlflow_run_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; error_code" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="890" width="300" height="315" as="geometry" />
+        </mxCell>
+        <mxCell id="model_interfaces" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;model_interfaces&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK/UK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; model_version_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; input_schema_json&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; output_schema_json&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; schema_version" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="925" width="300" height="195" as="geometry" />
+        </mxCell>
+        <mxCell id="inference_deployments" value="&lt;b&gt;&lt;font style=&quot;font-size:23px&quot;&gt;inference_deployments&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;PK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; user_id&lt;br&gt;&lt;b&gt;&lt;font color=&quot;#174EA6&quot;&gt;FK&lt;/font&gt;&lt;/b&gt;&amp;nbsp; model_version_id&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; name&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; environment&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; status&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; kserve_namespace&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; kserve_service_name&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; endpoint&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; min_replicas / max_replicas&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; operation_started_at&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; applied_min / applied_max&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; error_code" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF9F5;strokeColor=#FF7A2F;strokeWidth=1.7;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="880" width="320" height="335" as="geometry" />
+        </mxCell>
+        <mxCell id="r-user-dataset" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="datasets">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-dataset-version" value="versions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="datasets" target="dataset_versions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-version-column" value="columns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="dataset_versions" target="dataset_columns">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-version-upload" value="uploads" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="dataset_versions" target="upload_sessions">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1050" y="95" />
+              <mxPoint x="1580" y="95" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r-user-audit" value="actor" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="audit_logs">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="25" y="300" />
+              <mxPoint x="25" y="620" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r-user-model" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="models">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="280" />
+              <mxPoint x="350" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r-user-job" value="requests" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="training_jobs">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="315" />
+              <mxPoint x="700" y="315" />
+              <mxPoint x="700" y="625" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r-model-job" value="trains" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="models" target="training_jobs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-version-job" value="input" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="dataset_versions" target="training_jobs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-column-job" value="target" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="dataset_columns" target="training_jobs">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1050" y="405" />
+              <mxPoint x="1040" y="405" />
+              <mxPoint x="1040" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r-job-event" value="events" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="training_jobs" target="training_job_events">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-job-checkpoint" value="checkpoints" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="training_jobs" target="training_checkpoints">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1040" y="835" />
+              <mxPoint x="1580" y="835" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r-job-version" value="candidates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="training_jobs" target="model_versions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-model-version" value="versions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="models" target="model_versions">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="685" y="850" />
+              <mxPoint x="690" y="1030" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r-version-interface" value="interface" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERzeroToOne;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="model_versions" target="model_interfaces">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-version-deploy" value="deployed as" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="model_versions" target="inference_deployments">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1040" y="1215" />
+              <mxPoint x="1575" y="1215" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r-user-deploy" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#475569;strokeWidth=1.6;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;fontFamily=Arial;fontSize=16;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="inference_deployments">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="20" y="70" />
+              <mxPoint x="1765" y="70" />
+              <mxPoint x="1765" y="1040" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

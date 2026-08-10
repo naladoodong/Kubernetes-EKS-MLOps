@@ -1,0 +1,84 @@
+---
+config:
+  layout: elk
+---
+erDiagram
+    direction LR
+    
+    USERS {
+        uuid id PK
+        varchar email
+    }
+
+    MODELS {
+        uuid id PK
+        uuid user_id FK
+        varchar name
+    }
+
+    MODEL_VERSIONS {
+        uuid id PK
+        uuid model_id FK
+        uuid training_job_id FK
+        integer version_number
+        varchar status
+        text artifact_uri
+        varchar artifact_format
+    }
+
+    MODEL_INTERFACES {
+        uuid id PK
+        uuid model_version_id FK, UK
+        jsonb input_schema_json
+        jsonb output_schema_json
+        varchar schema_version
+    }
+
+    INFERENCE_DEPLOYMENTS {
+        uuid id PK
+        uuid user_id FK
+        uuid model_version_id FK
+        varchar name
+        varchar environment
+        varchar status
+        varchar kserve_namespace
+        varchar kserve_service_name
+        text endpoint
+        integer min_replicas
+        integer max_replicas
+        jsonb traffic_config_json
+        varchar error_code
+    }
+
+    AUDIT_LOGS {
+        uuid id PK
+        varchar actor_type
+        uuid actor_user_id FK
+        varchar action
+        varchar resource_type
+        uuid resource_id
+        varchar request_id
+        varchar result
+        varchar error_code
+        timestamptz occurred_at
+    }
+
+    OUTBOX_EVENTS {
+        uuid id PK
+        varchar aggregate_type
+        uuid aggregate_id
+        varchar event_type
+        jsonb payload_json
+        varchar idempotency_key
+        timestamptz occurred_at
+        timestamptz published_at
+        integer retry_count
+        timestamptz next_attempt_at
+    }
+
+    USERS ||--o{ MODELS : owns
+    MODELS ||--o{ MODEL_VERSIONS : versions
+    MODEL_VERSIONS ||--o| MODEL_INTERFACES : contract
+    USERS ||--o{ INFERENCE_DEPLOYMENTS : owns
+    MODEL_VERSIONS ||--o{ INFERENCE_DEPLOYMENTS : deploys
+    USERS o|--o{ AUDIT_LOGS : actor

@@ -1,0 +1,94 @@
+---
+config:
+  layout: elk
+---
+erDiagram
+    direction LR
+    
+    USERS {
+        uuid id PK
+        varchar email
+    }
+
+    DATASET_VERSIONS {
+        uuid id PK
+        uuid dataset_id FK
+        integer version_number
+        varchar status
+    }
+
+    MODELS {
+        uuid id PK
+        uuid user_id FK
+        varchar name
+        timestamptz deleted_at
+    }
+
+    TRAINING_JOBS {
+        uuid id PK
+        uuid user_id FK
+        uuid model_id FK
+        uuid dataset_version_id FK
+        varchar status
+        varchar algorithm
+        jsonb hyperparameters
+        integer requested_gpu_count
+        varchar idempotency_key
+        varchar mlflow_run_id
+        timestamptz started_at
+        timestamptz finished_at
+        timestamptz cancel_requested_at
+        varchar error_code
+    }
+
+    TRAINING_JOB_EVENTS {
+        uuid id PK
+        uuid training_job_id FK
+        varchar event_type
+        varchar from_status
+        varchar to_status
+        text message
+        timestamptz occurred_at
+    }
+
+    TRAINING_CHECKPOINTS {
+        uuid id PK
+        uuid training_job_id FK
+        integer sequence_number
+        bigint epoch
+        bigint step
+        text storage_uri
+        boolean is_resumable
+    }
+
+    MODEL_VERSIONS {
+        uuid id PK
+        uuid model_id FK
+        uuid training_job_id FK
+        integer version_number
+        integer candidate_number
+        varchar status
+        text artifact_uri
+        varchar artifact_format
+        jsonb metrics_json
+        varchar mlflow_run_id
+        varchar error_code
+    }
+
+    MODEL_INTERFACES {
+        uuid id PK
+        uuid model_version_id FK, UK
+        jsonb input_schema_json
+        jsonb output_schema_json
+        varchar schema_version
+    }
+
+    USERS ||--o{ MODELS : owns
+    USERS ||--o{ TRAINING_JOBS : requests
+    DATASET_VERSIONS ||--o{ TRAINING_JOBS : input
+    MODELS ||--o{ TRAINING_JOBS : target
+    TRAINING_JOBS ||--o{ TRAINING_JOB_EVENTS : events
+    TRAINING_JOBS ||--o{ TRAINING_CHECKPOINTS : checkpoints
+    TRAINING_JOBS ||--o{ MODEL_VERSIONS : produces
+    MODELS ||--o{ MODEL_VERSIONS : versions
+    MODEL_VERSIONS ||--o| MODEL_INTERFACES : contract

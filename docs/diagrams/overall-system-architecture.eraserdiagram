@@ -1,0 +1,116 @@
+cloud-architecture-diagram
+direction right
+colorMode pastel
+styleMode plain
+typeface clean
+
+// Users and access boundaries
+End_User [icon: user, label: "End User"]
+
+AWS_Cloud [label: "AWS"] {
+  Route_53 [icon: aws-route-53, label: "Route 53"]
+  AWS_WAF [icon: aws-waf, label: "AWS WAF"]
+
+  ArgMax_VPC [icon: aws-vpc, label: "ArgMax VPC • IPv4 • 2 AZ"] {
+    Internet_Gateway [icon: aws-internet-gateway, label: "Internet Gateway"]
+
+    Public_Subnets [label: "Public Subnets • AZ-A / AZ-B"] {
+      Internet_ALB [icon: aws-elb-application-load-balancer, label: "Internet-facing ALB"]
+      NAT_Gateways [icon: aws-nat-gateway, label: "NAT Gateway ×2\none per AZ"]
+    }
+
+    Private_Application_Subnets [label: "Private Application Subnets • AZ-A / AZ-B"] {
+      EKS_Cluster [icon: aws-elastic-kubernetes-service, label: "Amazon EKS\nprivate nodes and Pods"] {
+        Control_Orchestration [label: "Control / Orchestration"] {
+          Backend_API [label: "Backend API"]
+          Outbox_Publisher [label: "Outbox Publisher"]
+          Dataset_Controller [label: "Dataset Controller"]
+          Training_Controller [label: "Training Controller"]
+          Deployment_Controller [label: "Deployment Controller"]
+          Inference_Gateway [label: "Inference Gateway"]
+        }
+
+        Execution_Platform [label: "Execution / Platform"] {
+          Dataset_Job [label: "Dataset Processing Job"]
+          GPU_Training_Job [label: "GPU Training Job\nXGBoost CUDA"]
+          KServe [label: "KServe\nXGBoost CPU\ncluster-local"]
+          MLflow [label: "MLflow\nExperiment Tracking"]
+          Prometheus_Grafana [label: "Prometheus / Grafana"]
+        }
+      }
+
+      S3_Gateway_Endpoint [label: "S3 Gateway Endpoint\nprivate S3 route"]
+    }
+
+    Private_Data_Subnets [label: "Private Data Subnets • AZ-A / AZ-B"] {
+      RDS [icon: aws-rds, label: "RDS PostgreSQL\nMulti-AZ\nBusiness State & Execution Intent"]
+    }
+  }
+
+  SQS [icon: aws-simple-queue-service, label: "Amazon SQS\nDataset / Training\nWake-up Signal"]
+  S3 [icon: aws-simple-storage-service, label: "Amazon S3"] {
+    Dataset_Storage [label: "Dataset Storage\nOriginal / Parquet"]
+    Artifact_Storage [label: "ML Artifacts\nCheckpoints / Models"]
+    Inference_Analytics [label: "InferenceLog\nParquet"]
+  }
+  Glue [icon: aws-glue, label: "Glue Data Catalog"]
+  Athena [icon: aws-athena, label: "Athena"]
+  CloudWatch [icon: aws-cloudwatch, label: "CloudWatch"]
+}
+
+// Internal users are defined after AWS services to keep their logical-access edges local.
+ML_Engineer [icon: user, label: "ML Engineer"]
+Data_Analyst [icon: user, label: "Data Analyst"]
+Platform_Operator [icon: user, label: "Platform Operator"]
+
+// Public request path: only Backend API and Inference Gateway are ALB targets.
+End_User > Route_53 > AWS_WAF > Internet_ALB
+Internet_ALB > Backend_API, Inference_Gateway: HTTPS application traffic
+
+// Upload path: the client uses Amazon S3's public service endpoint, not the VPC endpoint.
+End_User --> Dataset_Storage: Presigned direct upload ≤ 2 GB
+
+// Business state, transactional outbox, and wake-up flow.
+Backend_API <> RDS: business state
+Outbox_Publisher <> RDS: claim / mark published
+Outbox_Publisher --> SQS: at-least-once publish
+SQS --> Dataset_Controller, Training_Controller: wake-up
+Dataset_Controller, Training_Controller, Deployment_Controller <> RDS: reconcile state
+Inference_Gateway > RDS: metadata / authorization
+
+// Dataset processing and GPU training.
+Dataset_Controller > Dataset_Job: create / reconcile
+Dataset_Storage > Dataset_Job: original dataset [color: green]
+Dataset_Job > Dataset_Storage: processed Parquet [color: green]
+Training_Controller > GPU_Training_Job: create / reconcile
+Dataset_Storage > GPU_Training_Job: processed dataset [color: green]
+GPU_Training_Job > Artifact_Storage: checkpoints / model [color: green]
+GPU_Training_Job --> MLflow: experiment metrics
+
+// Deployment and synchronous serving remain inside the cluster boundary.
+Deployment_Controller > KServe: create / reconcile
+Inference_Gateway > KServe: synchronous inference
+Artifact_Storage > KServe: load model artifact [color: green]
+Inference_Gateway --> Inference_Analytics: validated inference analytics [color: green]
+
+// S3 Gateway Endpoint is a VPC route, not an application-layer proxy hop.
+EKS_Cluster <> S3_Gateway_Endpoint: private S3 access [color: green]
+S3_Gateway_Endpoint <> S3: gateway route [color: green]
+EKS_Cluster > NAT_Gateways: non-S3 AWS API / Internet egress
+NAT_Gateways > Internet_Gateway: Internet egress
+
+// Analytics, private operational access, and observability.
+Dataset_Storage > Glue: catalog metadata
+Inference_Analytics > Glue: catalog metadata
+Glue > Athena: query catalog
+ML_Engineer --> MLflow: trusted internal / administrative access required
+ML_Engineer --> Athena: experiment and quality analysis
+Data_Analyst --> Athena: analytical queries
+EKS_Cluster --> CloudWatch: logs
+Platform_Operator --> Prometheus_Grafana, CloudWatch: operate
+
+legend [position: bottom-left] {
+  [connection: >, label: "Request / Control / Data"]
+  [connection: -->, label: "Async / Logical Access"]
+  [color: green, label: "S3 data flow; private workloads use VPC endpoint"]
+}

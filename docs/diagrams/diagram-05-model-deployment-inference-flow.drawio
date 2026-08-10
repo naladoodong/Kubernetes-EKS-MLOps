@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-08-07T00:00:00.000Z" agent="Codex" version="30.0.1" type="device">
+  <diagram id="diagram-05" name="Model Deployment and Inference">
+    <mxGraphModel dx="1600" dy="950" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;b&gt;ArgMax Mini - Model Deployment and Inference Flow (Diagram 5)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=28;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="180" y="15" width="1240" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="state" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#F8FAFC;fillOpacity=100;strokeColor=#CBD5E1;strokeWidth=1.3;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="35" y="80" width="1530" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="state-label" value="&lt;b&gt;InferenceDeployment lifecycle&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="55" y="92" width="330" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="pending" value="&lt;b&gt;PENDING&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFBEB;strokeColor=#F2B84B;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="360" y="112" width="145" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="deploying" value="&lt;b&gt;DEPLOYING&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="550" y="112" width="145" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ready" value="&lt;b&gt;READY&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="740" y="112" width="145" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="updating" value="&lt;b&gt;UPDATING&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1030" y="112" width="145" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ready2" value="&lt;b&gt;READY&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="112" width="145" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="delete-source" value="&lt;b&gt;READY / FAILED&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="740" y="177" width="180" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="deleting" value="&lt;b&gt;DELETING&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF9F5;strokeColor=#FF7A2F;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1030" y="177" width="145" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="deleted" value="&lt;b&gt;DELETED&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="177" width="145" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="state-create-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="pending" target="deploying">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="state-create-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="deploying" target="ready">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="state-update-1" value="UPDATE" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=12;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="ready" target="updating">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="state-update-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="updating" target="ready2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="state-delete-1" value="DELETE" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=12;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="delete-source" target="deleting">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="state-delete-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="deleting" target="deleted">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="failure" value="DEPLOYING / UPDATING / DELETING may transition to FAILED" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=13;fontColor=#B42318;" vertex="1" parent="1">
+          <mxGeometry x="55" y="183" width="640" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-band" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#F5F9FF;fillOpacity=30;strokeColor=#2F6BFF;strokeWidth=1.4;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="35" y="245" width="1530" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-label" value="&lt;b&gt;DEPLOYMENT LIFECYCLE&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#174EA6;" vertex="1" parent="1">
+          <mxGeometry x="55" y="257" width="300" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="client" value="&lt;b&gt;Client&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#334155&quot;&gt;create deployment&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="55" y="335" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="&lt;b&gt;Backend API&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#174EA6&quot;&gt;validate READY ModelVersion&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="255" y="335" width="190" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="rds" value="&lt;b&gt;RDS PostgreSQL&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#174EA6&quot;&gt;desired state = PENDING&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="475" y="335" width="190" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="controller" value="&lt;b&gt;Deployment Controller&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#174EA6&quot;&gt;reconcile desired / actual&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="695" y="335" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="kserve" value="&lt;b&gt;KServe Standard Mode&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#C2410C&quot;&gt;cluster-local Service&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF9F5;strokeColor=#FF7A2F;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="925" y="335" width="210" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="runtime" value="&lt;b&gt;Model Runtime&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#C2410C&quot;&gt;CPU XGBoost&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF9F5;strokeColor=#FF7A2F;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1165" y="335" width="175" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="artifact" value="&lt;b&gt;Amazon S3&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#176B2C&quot;&gt;immutable model artifact&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="335" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="client" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="api" target="rds">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="rds" target="controller">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="controller" target="kserve">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="kserve" target="runtime">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-artifact" value="load from S3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#21873E;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#21873E;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="artifact" target="runtime">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ready-write" value="readiness -&gt; READY" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2F6BFF;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#2F6BFF;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 6;" edge="1" parent="1" source="kserve" target="rds">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1040" y="500" />
+              <mxPoint x="570" y="500" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="infer-band" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFF9F5;fillOpacity=28;strokeColor=#FF7A2F;strokeWidth=1.4;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="35" y="560" width="1530" height="305" as="geometry" />
+        </mxCell>
+        <mxCell id="infer-label" value="&lt;b&gt;INFERENCE REQUEST LIFECYCLE&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#C2410C;" vertex="1" parent="1">
+          <mxGeometry x="55" y="572" width="380" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="infer-client" value="&lt;b&gt;Client&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:14px&quot; color=&quot;#334155&quot;&gt;HTTPS&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="55" y="660" width="150" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="alb" value="&lt;b&gt;ALB&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:14px&quot; color=&quot;#5B21B6&quot;&gt;public ingress&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FAF7FF;strokeColor=#8B5CF6;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="245" y="660" width="150" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" value="&lt;b&gt;Inference Gateway&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:15px&quot; color=&quot;#174EA6&quot;&gt;auth + schema + error contract&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="445" y="625" width="260" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="kserve-local" value="&lt;b&gt;KServe&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:16px&quot; color=&quot;#C2410C&quot;&gt;cluster-local only&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF9F5;strokeColor=#FF7A2F;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=20;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="790" y="625" width="250" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="run" value="&lt;b&gt;Runtime&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:15px&quot; color=&quot;#C2410C&quot;&gt;load artifact + predict&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF9F5;strokeColor=#FF7A2F;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1125" y="625" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="log-s3" value="&lt;b&gt;Amazon S3&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#176B2C&quot;&gt;async InferenceLog&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1390" y="665" width="145" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="lookup" value="&lt;b&gt;RDS lookup&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#174EA6&quot;&gt;deployment + ModelInterface&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=15;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="445" y="785" width="260" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="i1" value="request" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="infer-client" target="alb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i2" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="alb" target="gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i3" value="cluster-local inference" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="gateway" target="kserve-local">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i4" value="invoke" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="kserve-local" target="run">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i5" value="predictions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#21873E;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#21873E;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="run" target="gateway">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1235" y="790" />
+              <mxPoint x="575" y="790" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i6" value="validated response" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2F6BFF;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#2F6BFF;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 6;" edge="1" parent="1" source="gateway" target="infer-client">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="820" />
+              <mxPoint x="130" y="820" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lookup-edge" value="status + contract" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="gateway" target="lookup">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="log-edge" value="async InferenceLog" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#21873E;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#21873E;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 6;" edge="1" parent="1" source="gateway" target="log-s3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="730" y="855" />
+              <mxPoint x="1460" y="855" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="boundary-note" value="&lt;b&gt;Gateway is the only public inference application boundary.&lt;/b&gt; KServe has no external endpoint." style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFBEB;strokeColor=#F2B84B;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#7C4A03;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="755" y="805" width="610" height="45" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: argmax
+      POSTGRES_PASSWORD: argmax-local-only
+      POSTGRES_DB: argmax
+      TZ: UTC
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U argmax -d argmax"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - argmax-postgres:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      target: runtime
+    environment:
+      DATABASE_URL: postgresql+psycopg://argmax:argmax-local-only@db:5432/argmax
+      TZ: UTC
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  test:
+    profiles: ["test"]
+    build:
+      context: .
+      target: test
+    environment:
+      DATABASE_URL: postgresql+psycopg://argmax:argmax-local-only@db:5432/argmax
+      TZ: UTC
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  argmax-postgres:

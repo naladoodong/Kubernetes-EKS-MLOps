@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-08-07T00:00:00.000Z" agent="Codex" version="30.0.1" type="device">
+  <diagram id="diagram-03" name="Dataset Upload and Processing">
+    <mxGraphModel dx="1600" dy="950" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;b&gt;ArgMax Mini - Dataset Upload and Processing Flow (Diagram 3)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=28;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="180" y="15" width="1240" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="state-band" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#F8FAFC;fillOpacity=100;strokeColor=#CBD5E1;strokeWidth=1.3;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="35" y="80" width="1530" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="state-label" value="&lt;b&gt;DatasetVersion lifecycle&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="55" y="92" width="260" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="pending" value="&lt;b&gt;PENDING&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="310" y="110" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="uploading" value="&lt;b&gt;UPLOADING&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="535" y="110" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="state-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="pending" target="uploading">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uploaded" value="&lt;b&gt;UPLOADED&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="110" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="state-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="uploading" target="uploaded">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="processing" value="&lt;b&gt;PROCESSING&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF9F5;strokeColor=#FF7A2F;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="985" y="110" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="state-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="uploaded" target="processing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ready" value="&lt;b&gt;READY&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="110" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="state-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="processing" target="ready">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="failed" value="&lt;b&gt;FAILED&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#B42318&quot;&gt;from upload or processing&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF5F5;strokeColor=#E05252;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1185" y="185" width="270" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="upload-band" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;fillOpacity=100;strokeColor=#CBD5E1;strokeWidth=1.3;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="35" y="260" width="1530" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="upload-label" value="&lt;b&gt;DIRECT UPLOAD + COMPLETION&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="55" y="272" width="390" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="client" value="&lt;b&gt;Client&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#334155&quot;&gt;request URL / upload / complete&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="55" y="335" width="175" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="&lt;b&gt;Backend API&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#174EA6&quot;&gt;create version + presigned URL&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="270" y="335" width="175" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="upload-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="client" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" value="&lt;b&gt;Amazon S3&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#176B2C&quot;&gt;multipart object&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="485" y="335" width="175" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="upload-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#21873E;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#21873E;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="api" target="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="version" value="&lt;b&gt;DatasetVersion&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#174EA6&quot;&gt;UPLOADED after verification&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="700" y="335" width="175" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="upload-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="s3" target="version">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="outbox" value="&lt;b&gt;OutboxEvent&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#174EA6&quot;&gt;same DB transaction&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="915" y="335" width="175" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="upload-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="version" target="outbox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="publisher" value="&lt;b&gt;Outbox Publisher&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#174EA6&quot;&gt;claim + publish&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="335" width="175" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="upload-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2F6BFF;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#2F6BFF;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 6;" edge="1" parent="1" source="outbox" target="publisher">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sqs" value="&lt;b&gt;Amazon SQS&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot; color=&quot;#A61E63&quot;&gt;at-least-once wake-up&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF5FA;strokeColor=#D63384;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1345" y="335" width="175" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="upload-6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2F6BFF;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=13;fontColor=#2F6BFF;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 6;" edge="1" parent="1" source="publisher" target="sqs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="api-note" value="&lt;b&gt;Backend API is not in the file data path&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#176B2C;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="170" y="455" width="380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="verify-note" value="CompleteMultipartUpload&lt;br&gt;&lt;b&gt;HeadObject / object verification&lt;/b&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#176B2C;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="570" y="455" width="350" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="outbox-note" value="&lt;b&gt;Transactional Outbox&lt;/b&gt;&lt;br&gt;state + event intent commit together" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#174EA6;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="940" y="455" width="360" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="process-band" value="" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#F7FAFF;fillOpacity=22;strokeColor=#2F6BFF;strokeWidth=1.3;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="35" y="575" width="1530" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="process-label" value="&lt;b&gt;ASYNC PROCESSING + RECONCILIATION&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=18;fontColor=#174EA6;" vertex="1" parent="1">
+          <mxGeometry x="55" y="587" width="470" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="sqs2" value="&lt;b&gt;Amazon SQS&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:13px&quot; color=&quot;#A61E63&quot;&gt;wake-up signal&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF5FA;strokeColor=#D63384;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=17;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="655" width="225" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="controller" value="&lt;b&gt;Dataset Controller&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:13px&quot; color=&quot;#174EA6&quot;&gt;RDS state + idempotency&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F5F9FF;strokeColor=#2F6BFF;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=17;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="655" width="225" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="process-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2F6BFF;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#2F6BFF;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 6;" edge="1" parent="1" source="sqs2" target="controller">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="job" value="&lt;b&gt;Processing Job&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:13px&quot; color=&quot;#C2410C&quot;&gt;Managed Node Group&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFF9F5;strokeColor=#FF7A2F;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=17;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="680" y="655" width="225" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="process-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#111827;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#111827;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="controller" target="job">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="parquet" value="&lt;b&gt;Amazon S3&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:13px&quot; color=&quot;#176B2C&quot;&gt;processed Parquet&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=17;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="980" y="655" width="225" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="process-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#21873E;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#21873E;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="job" target="parquet">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ready2" value="&lt;b&gt;DatasetVersion&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:13px&quot; color=&quot;#176B2C&quot;&gt;READY + DatasetColumn&lt;/font&gt;" style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#F3FAF4;strokeColor=#4D9461;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=17;fontColor=#111827;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="655" width="225" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="process-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#21873E;strokeWidth=2;endArrow=block;endFill=1;fontFamily=Arial;fontSize=14;fontColor=#21873E;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="parquet" target="ready2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="job-work" value="parse CSV/XLSX - write Parquet - extract schema" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#C2410C;" vertex="1" parent="1">
+          <mxGeometry x="430" y="785" width="760" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="authority" value="&lt;b&gt;RDS is the status authority.&lt;/b&gt; SQS is an event delivery channel, not a job store." style="rounded=1;arcSize=10;html=1;whiteSpace=wrap;fillColor=#FFFBEB;strokeColor=#F2B84B;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=15;fontColor=#7C4A03;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="875" width="1080" height="45" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

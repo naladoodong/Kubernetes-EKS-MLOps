@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ArgMax Mini — Kubernetes MLOps Architecture Case Study</title>
+    <meta
+      name="description"
+      content="An EKS-based MLOps architecture for 2 GB tabular datasets, 12–24 hour GPU training, reliable asynchronous execution, model versioning, and online inference."
+    >
+    <meta name="theme-color" content="#f5f4ef">
+    <link rel="canonical" href="https://naladoodong.github.io/Kubernetes-EKS-MLOps/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ArgMax Mini — MLOps Architecture Case Study">
+    <meta
+      property="og:description"
+      content="Designed an EKS-based MLOps platform for large tabular datasets, long-running GPU training, model versioning, and online inference."
+    >
+    <meta property="og:url" content="https://naladoodong.github.io/Kubernetes-EKS-MLOps/">
+    <meta property="og:image" content="https://naladoodong.github.io/Kubernetes-EKS-MLOps/assets/og.png">
+    <meta property="og:image:alt" content="ArgMax Mini architecture case study preview">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ArgMax Mini — MLOps Architecture Case Study">
+    <meta
+      name="twitter:description"
+      content="EKS, long-running GPU workloads, transactional outbox, reconciliation, model lineage, and KServe."
+    >
+    <meta name="twitter:image" content="https://naladoodong.github.io/Kubernetes-EKS-MLOps/assets/og.png">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to case study</a>
+
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="brand" href="#top" aria-label="ArgMax Mini home">
+          <span class="brand-mark" aria-hidden="true">AM</span>
+          <span>ArgMax Mini</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <span class="sr-only">Toggle navigation</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+          <a href="#challenges">Challenges</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#flows">Flows</a>
+          <a href="#decisions">Decisions</a>
+          <a href="#scope">Scope</a>
+          <a class="nav-cta" href="./assets/ArgMax_Mini_System_Architecture_and_Design.pdf">PDF</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section id="top" class="hero section-pad" aria-labelledby="hero-title">
+        <div class="shell hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">Architecture case study · 2026</p>
+            <h1 id="hero-title">ArgMax Mini</h1>
+            <p class="hero-subtitle">Kubernetes-based MLOps Platform Architecture</p>
+            <p class="hero-lede">
+              Designed an EKS-based MLOps platform for large tabular datasets, long-running GPU
+              training, model versioning, and online inference. The architecture separates business
+              state from execution and treats failure recovery as a first-class design concern.
+            </p>
+            <div class="hero-actions" aria-label="Case study actions">
+              <a class="button button-primary" href="#architecture">Explore architecture</a>
+              <a class="button button-secondary" href="./assets/ArgMax_Mini_System_Architecture_and_Design.pdf">
+                View detailed PDF
+              </a>
+              <a
+                class="text-link"
+                href="https://github.com/naladoodong/Kubernetes-EKS-MLOps"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View repository <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <aside class="hero-brief" aria-label="Case study scope">
+            <div class="brief-status">
+              <span class="status-dot" aria-hidden="true"></span>
+              Target architecture
+            </div>
+            <p class="brief-kicker">Core design thesis</p>
+            <p class="brief-quote">
+              Keep the API out of the file data path and the GPU workload lifecycle.
+            </p>
+            <dl class="brief-list">
+              <div>
+                <dt>Business state</dt>
+                <dd>RDS PostgreSQL</dd>
+              </div>
+              <div>
+                <dt>Execution</dt>
+                <dd>Kubernetes Jobs</dd>
+              </div>
+              <div>
+                <dt>Recovery</dt>
+                <dd>Idempotency + reconciliation</dd>
+              </div>
+            </dl>
+            <p class="scope-disclosure">
+              Production EKS is designed, not claimed as deployed. The implemented assignment scope
+              is identified explicitly below.
+            </p>
+          </aside>
+        </div>
+
+        <div class="shell signal-grid" aria-label="Architecture requirements">
+          <div class="signal">
+            <strong>2 GB</strong>
+            <span>CSV / XLSX direct upload</span>
+          </div>
+          <div class="signal">
+            <strong>12–24h</strong>
+            <span>GPU training lifecycle</span>
+          </div>
+          <div class="signal">
+            <strong>14</strong>
+            <span>RDB entities with lineage</span>
+          </div>
+          <div class="signal">
+            <strong>32</strong>
+            <span>Accepted architecture decisions</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="challenges" class="section-pad section-tint" aria-labelledby="challenges-title">
+        <div class="shell">
+          <div class="section-heading heading-grid">
+            <div>
+              <p class="eyebrow">01 · Engineering challenges</p>
+              <h2 id="challenges-title">The hard parts are lifecycle boundaries.</h2>
+            </div>
+            <p>
+              The platform handles four workflows with different data volumes, runtimes, failure
+              modes, and ownership rules. Each boundary is made explicit instead of hidden inside
+              one API process.
+            </p>
+          </div>
+
+          <div class="challenge-grid">
+            <article class="challenge-card">
+              <div class="card-index">01</div>
+              <h3>Large dataset upload</h3>
+              <p class="flow-line">2 GB CSV/XLSX <span>→</span> S3 multipart <span>→</span> async processing</p>
+              <p>The API issues upload intent and presigned URLs; it never becomes the bulk file data path.</p>
+              <span class="outcome">Protect API bandwidth and request lifetime</span>
+            </article>
+
+            <article class="challenge-card">
+              <div class="card-index">02</div>
+              <h3>Long-running GPU training</h3>
+              <p class="flow-line">12–24h training <span>→</span> Kubernetes Job <span>→</span> S3 checkpoint</p>
+              <p>GPU execution is isolated from the API and scheduled onto Karpenter-provisioned capacity.</p>
+              <span class="outcome">Recoverable execution with independent scaling</span>
+            </article>
+
+            <article class="challenge-card">
+              <div class="card-index">03</div>
+              <h3>Distributed consistency</h3>
+              <p class="flow-line">PostgreSQL <span>→</span> outbox <span>→</span> SQS <span>→</span> controller</p>
+              <p>At-least-once delivery, conditional updates, and reconciliation handle partial failure.</p>
+              <span class="outcome">Durable intent without exactly-once claims</span>
+            </article>
+
+            <article class="challenge-card">
+              <div class="card-index">04</div>
+              <h3>Model serving boundary</h3>
+              <p class="flow-line">Gateway <span>→</span> interface validation <span>→</span> KServe</p>
+              <p>Business policy and public contracts stay in the gateway; the runtime only loads and predicts.</p>
+              <span class="outcome">Stable API contract across model versions</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="architecture" class="section-pad" aria-labelledby="architecture-title">
+        <div class="shell">
+          <div class="section-heading heading-grid">
+            <div>
+              <p class="eyebrow">02 · Architecture overview</p>
+              <h2 id="architecture-title">Control intent. Isolate execution.</h2>
+            </div>
+            <p>
+              Public traffic reaches only the Backend API and Inference Gateway. The EKS control
+              plane records intent in RDS; data-plane Jobs and KServe perform the expensive work.
+            </p>
+          </div>
+
+          <figure class="diagram-figure">
+            <div class="diagram-toolbar">
+              <div>
+                <span class="asset-label">System boundary</span>
+                <strong>Overall architecture</strong>
+              </div>
+              <a href="./assets/diagrams/diagram-01-overall-architecture.svg" target="_blank" rel="noreferrer">
+                Open full size <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div class="diagram-scroll" tabindex="0" aria-label="Scrollable overall architecture diagram">
+              <img
+                class="architecture-image"
+                src="./assets/diagrams/diagram-01-overall-architecture.svg"
+                alt="Overall ArgMax Mini AWS architecture showing public ingress, EKS control and data planes, RDS, SQS, S3, and analytics services"
+                width="2048"
+                height="1209"
+              >
+            </div>
+            <figcaption>
+              Existing architecture source asset. On narrow screens, scroll horizontally or open the full-size SVG.
+            </figcaption>
+          </figure>
+
+          <div class="principle-grid">
+            <article>
+              <p class="principle-number">A</p>
+              <h3>Control Plane</h3>
+              <p>Owns business state, validates intent, publishes durable events, and reconciles observed execution.</p>
+            </article>
+            <article>
+              <p class="principle-number">B</p>
+              <h3>Data Plane</h3>
+              <p>Runs dataset processing, GPU training, and model inference against immutable objects in S3.</p>
+            </article>
+            <article>
+              <p class="principle-number">C</p>
+              <h3>Source of Truth</h3>
+              <p>RDS stores business state. SQS accelerates work; Kubernetes reports execution. Neither replaces RDS.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="flows" class="section-pad section-dark" aria-labelledby="flows-title">
+        <div class="shell">
+          <div class="section-heading heading-grid heading-on-dark">
+            <div>
+              <p class="eyebrow">03 · Key architecture flows</p>
+              <h2 id="flows-title">Three paths, three ownership models.</h2>
+            </div>
+            <p>
+              Each flow preserves one durable record of intent, one explicit execution boundary,
+              and a defined point where completion becomes business truth.
+            </p>
+          </div>
+
+          <div class="flow-stack">
+            <details class="flow-panel" open>
+              <summary>
+                <span class="flow-summary-index">01</span>
+                <span>
+                  <strong>Dataset flow</strong>
+                  <small>Direct upload → verified processing → Parquet</small>
+                </span>
+                <span class="summary-action">View flow</span>
+              </summary>
+              <div class="flow-content">
+                <ol class="route-strip" aria-label="Dataset processing route">
+                  <li>Client</li><li>Backend API</li><li>S3</li><li>Outbox</li><li>SQS</li><li>Controller</li><li>Job</li><li>Parquet</li>
+                </ol>
+                <div class="dark-diagram-scroll" tabindex="0" aria-label="Scrollable dataset flow diagram">
+                  <img
+                    src="./assets/diagrams/diagram-03-dataset-upload-processing-flow.svg"
+                    alt="Dataset direct upload, transactional outbox, SQS, processing Job, and Parquet result flow"
+                    loading="lazy"
+                    width="2048"
+                    height="1186"
+                  >
+                </div>
+              </div>
+            </details>
+
+            <details class="flow-panel">
+              <summary>
+                <span class="flow-summary-index">02</span>
+                <span>
+                  <strong>Training flow</strong>
+                  <small>Idempotent request → GPU Job → immutable ModelVersion</small>
+                </span>
+                <span class="summary-action">View flow</span>
+              </summary>
+              <div class="flow-content">
+                <ol class="route-strip" aria-label="Training route">
+                  <li>Request</li><li>RDS</li><li>Outbox</li><li>SQS</li><li>Controller</li><li>GPU Job</li><li>Checkpoint</li><li>ModelVersion</li>
+                </ol>
+                <div class="dark-diagram-scroll" tabindex="0" aria-label="Scrollable training flow diagram">
+                  <img
+                    src="./assets/diagrams/diagram-04-training-model-publishing.svg"
+                    alt="GPU training lifecycle with SQS, controller, Karpenter, checkpoint, artifact, and ModelVersion publication"
+                    loading="lazy"
+                    width="2048"
+                    height="1186"
+                  >
+                </div>
+              </div>
+            </details>
+
+            <details class="flow-panel">
+              <summary>
+                <span class="flow-summary-index">03</span>
+                <span>
+                  <strong>Inference flow</strong>
+                  <small>Public gateway → interface contract → cluster-local runtime</small>
+                </span>
+                <span class="summary-action">View flow</span>
+              </summary>
+              <div class="flow-content">
+                <ol class="route-strip" aria-label="Inference route">
+                  <li>Client</li><li>ALB</li><li>Gateway</li><li>RDS contract</li><li>KServe</li><li>Runtime</li><li>Response</li>
+                </ol>
+                <div class="dark-diagram-scroll" tabindex="0" aria-label="Scrollable inference flow diagram">
+                  <img
+                    src="./assets/diagrams/diagram-05-model-deployment-inference-flow.svg"
+                    alt="Model deployment and online inference flow through Backend API, deployment controller, KServe, and Inference Gateway"
+                    loading="lazy"
+                    width="2048"
+                    height="1124"
+                  >
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="reliability" class="section-pad" aria-labelledby="reliability-title">
+        <div class="shell">
+          <div class="section-heading heading-grid">
+            <div>
+              <p class="eyebrow">04 · Reliability &amp; distributed systems</p>
+              <h2 id="reliability-title">Designing for the state between systems.</h2>
+            </div>
+            <p>
+              The architecture does not attempt to eliminate distributed inconsistency. It defines
+              how each component observes, retries, and converges on RDS business state.
+            </p>
+          </div>
+
+          <div class="reliability-layout">
+            <div class="reliability-grid">
+              <article>
+                <span class="mono-tag">OUTBOX</span>
+                <h3>Transactional event intent</h3>
+                <p>Business changes and OutboxEvent commit in one PostgreSQL transaction. Publishing happens afterward.</p>
+                <p class="reliability-note">Guarantee: at-least-once delivery + idempotent consumer</p>
+              </article>
+              <article>
+                <span class="mono-tag">CAS</span>
+                <h3>Conditional state transition</h3>
+                <p>Expected current state is part of each update, preventing stale controllers from overwriting newer facts.</p>
+                <p class="reliability-note">Guard: rows affected must equal one</p>
+              </article>
+              <article>
+                <span class="mono-tag">RECONCILE</span>
+                <h3>Periodic convergence</h3>
+                <p>A 60-second reconciler compares RDS intent with Kubernetes observations and repairs missed wake-ups.</p>
+                <p class="reliability-note">Recovers: message loss, DLQ, restarts, drift</p>
+              </article>
+              <article>
+                <span class="mono-tag">CHECKPOINT</span>
+                <h3>Bounded recomputation</h3>
+                <p>Long GPU runs persist resumable checkpoints in S3, reducing interruption risk and recovery cost.</p>
+                <p class="reliability-note">Rule: Job completion is not business success</p>
+              </article>
+            </div>
+
+            <div class="code-card" aria-label="Conditional SQL transition example">
+              <div class="code-card-top">
+                <span>training_jobs.sql</span>
+                <span>atomic transition</span>
+              </div>
+              <pre><code><span class="code-keyword">UPDATE</span> training_jobs
+<span class="code-keyword">SET</span> status = <span class="code-value">'RUNNING'</span>
+<span class="code-keyword">WHERE</span> id = :job_id
+  <span class="code-keyword">AND</span> status = <span class="code-value">'SCHEDULING'</span>;</code></pre>
+              <div class="code-explanation">
+                <p><strong>Why it matters</strong></p>
+                <p>Duplicate messages and competing observations become harmless when only the valid predecessor can advance.</p>
+              </div>
+            </div>
+          </div>
+
+          <blockquote class="systems-quote">
+            <p>Exactly-once is not the claim. Durable intent, idempotent effects, and reconciliation are the design.</p>
+          </blockquote>
+        </div>
+      </section>
+
+      <section id="data-model" class="section-pad section-tint" aria-labelledby="data-title">
+        <div class="shell">
+          <div class="section-heading heading-grid">
+            <div>
+              <p class="eyebrow">05 · Data model</p>
+              <h2 id="data-title">Lineage is modeled, not inferred.</h2>
+            </div>
+            <p>
+              Logical resources are separated from immutable versions. TrainingJob carries
+              provenance from the exact DatasetVersion to the produced ModelVersion and deployment.
+            </p>
+          </div>
+
+          <div class="lineage" aria-label="Core data lineage">
+            <div class="lineage-node">
+              <span>Logical asset</span>
+              <strong>Dataset</strong>
+            </div>
+            <span class="lineage-arrow" aria-hidden="true">→</span>
+            <div class="lineage-node lineage-node-accent">
+              <span>Immutable input</span>
+              <strong>DatasetVersion</strong>
+            </div>
+            <span class="lineage-arrow" aria-hidden="true">→</span>
+            <div class="lineage-node lineage-node-dark">
+              <span>Execution provenance</span>
+              <strong>TrainingJob</strong>
+            </div>
+            <span class="lineage-arrow" aria-hidden="true">→</span>
+            <div class="lineage-node lineage-node-accent">
+              <span>Immutable output</span>
+              <strong>ModelVersion</strong>
+            </div>
+            <span class="lineage-arrow" aria-hidden="true">→</span>
+            <div class="lineage-node">
+              <span>Runtime binding</span>
+              <strong>InferenceDeployment</strong>
+            </div>
+          </div>
+
+          <div class="model-insights">
+            <article>
+              <span class="insight-value">14</span>
+              <h3>Entities with explicit responsibility</h3>
+              <p>UploadSession, ModelInterface, AuditLog, and OutboxEvent exist to solve distinct operational problems.</p>
+            </article>
+            <article>
+              <span class="insight-value">1:N</span>
+              <h3>Logical resource to versions</h3>
+              <p>Dataset / DatasetVersion and Model / ModelVersion prevent mutable metadata from erasing reproducibility.</p>
+            </article>
+            <article>
+              <span class="insight-value">FK</span>
+              <h3>Deletion policy is deliberate</h3>
+              <p>CASCADE removes owned detail; RESTRICT protects lineage; soft delete preserves user-facing logical resources.</p>
+            </article>
+            <article>
+              <span class="insight-value">UQ</span>
+              <h3>Concurrency has a database backstop</h3>
+              <p>Parent row locks assign version numbers; unique constraints provide the final consistency guarantee.</p>
+            </article>
+          </div>
+
+          <details class="erd-panel">
+            <summary>
+              <span>
+                <strong>Explore the full physical ERD</strong>
+                <small>14 entities · keys, lifecycle metadata, and deletion boundaries</small>
+              </span>
+              <span class="summary-action">Expand ERD</span>
+            </summary>
+            <div class="erd-content">
+              <div class="diagram-scroll" tabindex="0" aria-label="Scrollable full database relationship diagram">
+                <img
+                  src="./assets/diagrams/diagram-06-rdb-schema.svg"
+                  alt="Full ArgMax Mini relational schema with 14 entities across data upload, training provenance, publication, deployment, audit, and outbox domains"
+                  loading="lazy"
+                  width="2048"
+                  height="1399"
+                >
+              </div>
+              <a href="./assets/diagrams/diagram-06-rdb-schema.svg" target="_blank" rel="noreferrer">
+                Open full-size ERD <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="decisions" class="section-pad" aria-labelledby="decisions-title">
+        <div class="shell">
+          <div class="section-heading heading-grid">
+            <div>
+              <p class="eyebrow">06 · Architecture decisions</p>
+              <h2 id="decisions-title">Decisions carry consequences.</h2>
+            </div>
+            <p>
+              Eight decisions summarize the 32 accepted ADRs. Every choice includes the constraint it
+              addresses and the operational responsibility it introduces.
+            </p>
+          </div>
+
+          <div class="decision-grid">
+            <article class="decision-card">
+              <p class="decision-id">ADR 001</p>
+              <h3>Amazon EKS</h3>
+              <dl>
+                <div><dt>Decision</dt><dd>Use EKS as the target runtime.</dd></div>
+                <div><dt>Why</dt><dd>Unify Jobs, GPU scheduling, KServe, and policy.</dd></div>
+                <div><dt>Trade-off</dt><dd>Cluster and controller operations become platform responsibilities.</dd></div>
+              </dl>
+            </article>
+            <article class="decision-card">
+              <p class="decision-id">ADR 002</p>
+              <h3>Control / Data Plane</h3>
+              <dl>
+                <div><dt>Decision</dt><dd>Separate orchestration from execution.</dd></div>
+                <div><dt>Why</dt><dd>Different workloads need different failure and scaling boundaries.</dd></div>
+                <div><dt>Trade-off</dt><dd>Observed execution must be reconciled with business state.</dd></div>
+              </dl>
+            </article>
+            <article class="decision-card">
+              <p class="decision-id">ADR 008</p>
+              <h3>Kubernetes GPU Job</h3>
+              <dl>
+                <div><dt>Decision</dt><dd>Run 12–24 hour training as a Job.</dd></div>
+                <div><dt>Why</dt><dd>Isolate lifetime, GPU requests, retries, and timeout.</dd></div>
+                <div><dt>Trade-off</dt><dd>Job completion still requires business-level finalization.</dd></div>
+              </dl>
+            </article>
+            <article class="decision-card">
+              <p class="decision-id">ADR 006 / 028</p>
+              <h3>SQS + Transactional Outbox</h3>
+              <dl>
+                <div><dt>Decision</dt><dd>Persist event intent with the domain change.</dd></div>
+                <div><dt>Why</dt><dd>Avoid the DB / queue dual-write gap.</dd></div>
+                <div><dt>Trade-off</dt><dd>Duplicate delivery requires idempotent consumers and cleanup.</dd></div>
+              </dl>
+            </article>
+            <article class="decision-card">
+              <p class="decision-id">ADR 009</p>
+              <h3>Karpenter GPU capacity</h3>
+              <dl>
+                <div><dt>Decision</dt><dd>Keep core nodes stable; provision GPU nodes on demand.</dd></div>
+                <div><dt>Why</dt><dd>Match intermittent expensive capacity to pending Jobs.</dd></div>
+                <div><dt>Trade-off</dt><dd>Cold capacity adds scheduling delay and disruption policy work.</dd></div>
+              </dl>
+            </article>
+            <article class="decision-card">
+              <p class="decision-id">ADR 012 / 013</p>
+              <h3>KServe Standard Mode</h3>
+              <dl>
+                <div><dt>Decision</dt><dd>Keep KServe cluster-local behind the Inference Gateway.</dd></div>
+                <div><dt>Why</dt><dd>Separate business contracts from model runtime execution.</dd></div>
+                <div><dt>Trade-off</dt><dd>No scale-to-zero; active deployments keep at least one replica.</dd></div>
+              </dl>
+            </article>
+            <article class="decision-card">
+              <p class="decision-id">ADR 003 / 016</p>
+              <h3>PostgreSQL / S3 / Athena</h3>
+              <dl>
+                <div><dt>Decision</dt><dd>Separate OLTP, immutable objects, and analytical scans.</dd></div>
+                <div><dt>Why</dt><dd>Protect transactional performance and scale large data independently.</dd></div>
+                <div><dt>Trade-off</dt><dd>Catalog freshness and cross-store lifecycle need governance.</dd></div>
+              </dl>
+            </article>
+            <article class="decision-card">
+              <p class="decision-id">ADR 022</p>
+              <h3>Modular monolith</h3>
+              <dl>
+                <div><dt>Decision</dt><dd>Keep one codebase with separable process roles.</dd></div>
+                <div><dt>Why</dt><dd>Preserve domain boundaries without premature service sprawl.</dd></div>
+                <div><dt>Trade-off</dt><dd>Logical components are not all independently deployable yet.</dd></div>
+              </dl>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="complexity" class="section-pad section-plain" aria-labelledby="complexity-title">
+        <div class="shell complexity-layout">
+          <div>
+            <p class="eyebrow">07 · Avoiding unnecessary complexity</p>
+            <h2 id="complexity-title">Architecture quality is not measured by the number of technologies adopted.</h2>
+            <p class="complexity-lede">
+              Components were excluded when the requirement or measured bottleneck did not justify
+              the additional state, failure modes, and operator workload.
+            </p>
+          </div>
+          <div class="exclusion-list">
+            <article><strong>Redis</strong><span>No demonstrated RDS lookup bottleneck or cache invalidation requirement.</span></article>
+            <article><strong>KEDA</strong><span>The Training Controller already consumes SQS and creates Jobs.</span></article>
+            <article><strong>Knative</strong><span>No scale-to-zero or long-streaming requirement for tabular inference.</span></article>
+            <article><strong>Envoy Gateway</strong><span>ALB, Inference Gateway, and ClusterIP provide the required routing boundary.</span></article>
+            <article><strong>CloudFront</strong><span>No static asset or globally cached download requirement in the platform scope.</span></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="scope" class="section-pad scope-section" aria-labelledby="scope-title">
+        <div class="shell">
+          <div class="scope-heading">
+            <div>
+              <p class="eyebrow">08 · Designed vs implemented</p>
+              <h2 id="scope-title">Scope is part of the architecture.</h2>
+            </div>
+            <p>
+              This case study distinguishes the target production architecture from the limited
+              implementation scope. “Designed” never means deployed or operated in production.
+            </p>
+          </div>
+
+          <div class="scope-grid">
+            <article class="scope-card designed-card">
+              <div class="scope-card-heading">
+                <span class="scope-icon" aria-hidden="true">D</span>
+                <div>
+                  <p>Target architecture</p>
+                  <h3>Designed</h3>
+                </div>
+              </div>
+              <ul>
+                <li>Amazon EKS control and data planes</li>
+                <li>S3 direct upload and asynchronous processing</li>
+                <li>SQS, transactional outbox, controllers, reconciliation</li>
+                <li>GPU training Jobs and Karpenter NodePool</li>
+                <li>MLflow experiment tracking and S3 checkpoints</li>
+                <li>KServe Standard Mode and Inference Gateway</li>
+                <li>Glue / Athena analytics and observability baseline</li>
+                <li>GitHub Actions, ECR, Helm, and Argo CD delivery</li>
+              </ul>
+            </article>
+
+            <article class="scope-card implemented-card">
+              <div class="scope-card-heading">
+                <span class="scope-icon" aria-hidden="true">I</span>
+                <div>
+                  <p>Repository evidence</p>
+                  <h3>Implemented</h3>
+                </div>
+              </div>
+              <ul>
+                <li>FastAPI application with four Dataset CRUD endpoints</li>
+                <li>Readiness endpoint and generated OpenAPI contract</li>
+                <li>PostgreSQL schema for 14 architecture entities</li>
+                <li>Alembic migrations 0001–0004</li>
+                <li>Dataset aggregate query with latest / latest-ready version</li>
+                <li>Transactional Dataset audit logging and soft deletion</li>
+                <li>Docker Compose local evaluation environment</li>
+                <li>PostgreSQL integration tests and lint configuration</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="scope-warning" role="note">
+            <strong>Not claimed:</strong>
+            production EKS deployment, operated GPU clusters, Karpenter capacity, KServe serving,
+            MLflow operations, Athena pipelines, or production GitOps.
+          </div>
+        </div>
+      </section>
+
+      <section id="stack" class="section-pad" aria-labelledby="stack-title">
+        <div class="shell">
+          <div class="section-heading heading-grid compact-heading">
+            <div>
+              <p class="eyebrow">09 · Technology stack</p>
+              <h2 id="stack-title">Tools follow system boundaries.</h2>
+            </div>
+            <p>A compact view of the target stack. Scope status remains governed by the section above.</p>
+          </div>
+
+          <div class="stack-table" role="table" aria-label="Technology stack">
+            <div class="stack-row" role="row">
+              <div role="rowheader">Backend</div>
+              <div role="cell">FastAPI · Pydantic v2 · SQLAlchemy · Alembic · PostgreSQL</div>
+            </div>
+            <div class="stack-row" role="row">
+              <div role="rowheader">Orchestration</div>
+              <div role="cell">Amazon EKS · Kubernetes Job · Karpenter · KServe</div>
+            </div>
+            <div class="stack-row" role="row">
+              <div role="rowheader">AWS</div>
+              <div role="cell">RDS · S3 · SQS · ECR · ALB · WAF · Route 53 · Secrets Manager</div>
+            </div>
+            <div class="stack-row" role="row">
+              <div role="rowheader">MLOps</div>
+              <div role="cell">XGBoost · MLflow · ModelInterface JSON Schema · S3 checkpoints</div>
+            </div>
+            <div class="stack-row" role="row">
+              <div role="rowheader">Observability</div>
+              <div role="cell">Prometheus · Grafana · Alertmanager · DCGM Exporter · Fluent Bit · CloudWatch</div>
+            </div>
+            <div class="stack-row" role="row">
+              <div role="rowheader">Delivery</div>
+              <div role="cell">GitHub Actions · Helm · Argo CD · Docker Compose for local evaluation</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="materials" class="section-pad materials-section" aria-labelledby="materials-title">
+        <div class="shell materials-grid">
+          <div>
+            <p class="eyebrow">10 · Detailed materials</p>
+            <h2 id="materials-title">Continue into the evidence.</h2>
+            <p>
+              The portfolio is the entry point. The detailed PDF and source repository preserve the
+              full reasoning, schema constraints, state transitions, and original diagram sources.
+            </p>
+          </div>
+          <div class="material-links">
+            <a class="material-link" href="./assets/ArgMax_Mini_System_Architecture_and_Design.pdf">
+              <span>
+                <small>20-page design document</small>
+                <strong>Detailed architecture PDF</strong>
+              </span>
+              <span aria-hidden="true">↓</span>
+            </a>
+            <a
+              class="material-link"
+              href="https://github.com/naladoodong/Kubernetes-EKS-MLOps"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span>
+                <small>Code, ADRs, schema, diagrams</small>
+                <strong>GitHub repository</strong>
+              </span>
+              <span aria-hidden="true">↗</span>
+            </a>
+            <a class="material-link" href="./assets/diagrams/diagram-06-rdb-schema.svg" target="_blank" rel="noreferrer">
+              <span>
+                <small>14-entity physical model</small>
+                <strong>Full ERD</strong>
+              </span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <div>
+          <strong>ArgMax Mini</strong>
+          <p>Kubernetes-based MLOps Platform Architecture</p>
+        </div>
+        <p>Architecture case study · <span id="current-year">2026</span></p>
+      </div>
+    </footer>
+  </body>
+</html>

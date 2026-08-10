@@ -1,0 +1,123 @@
+---
+config:
+  layout: elk
+---
+erDiagram
+    direction LR
+    
+    USERS {
+        uuid id PK
+        varchar email
+    }
+
+    DATASETS {
+        uuid id PK
+        uuid user_id FK
+        varchar name
+        timestamptz deleted_at
+    }
+
+    DATASET_VERSIONS {
+        uuid id PK
+        uuid dataset_id FK
+        integer version_number
+        varchar status
+    }
+
+    DATASET_COLUMNS {
+        uuid id PK
+        uuid dataset_version_id FK
+        varchar name
+        varchar data_type
+    }
+
+    UPLOAD_SESSIONS {
+        uuid id PK
+        uuid dataset_version_id FK
+        varchar status
+    }
+
+    MODELS {
+        uuid id PK
+        uuid user_id FK
+        varchar name
+        timestamptz deleted_at
+    }
+
+    TRAINING_JOBS {
+        uuid id PK
+        uuid user_id FK
+        uuid model_id FK
+        uuid dataset_version_id FK
+        varchar status
+    }
+
+    TRAINING_JOB_EVENTS {
+        uuid id PK
+        uuid training_job_id FK
+        varchar event_type
+    }
+
+    TRAINING_CHECKPOINTS {
+        uuid id PK
+        uuid training_job_id FK
+        integer sequence_number
+    }
+
+    MODEL_VERSIONS {
+        uuid id PK
+        uuid model_id FK
+        uuid training_job_id FK
+        integer version_number
+        varchar status
+    }
+
+    MODEL_INTERFACES {
+        uuid id PK
+        uuid model_version_id FK, UK
+        varchar schema_version
+    }
+
+    INFERENCE_DEPLOYMENTS {
+        uuid id PK
+        uuid user_id FK
+        uuid model_version_id FK
+        varchar environment
+        varchar status
+    }
+
+    AUDIT_LOGS {
+        uuid id PK
+        uuid actor_user_id FK
+        varchar action
+        varchar result
+    }
+
+    OUTBOX_EVENTS {
+        uuid id PK
+        varchar aggregate_type
+        uuid aggregate_id
+        varchar event_type
+        timestamptz published_at
+    }
+
+    USERS ||--o{ DATASETS : owns
+    DATASETS ||--o{ DATASET_VERSIONS : versions
+    DATASET_VERSIONS ||--o{ DATASET_COLUMNS : columns
+    DATASET_VERSIONS ||--o{ UPLOAD_SESSIONS : uploads
+
+    USERS ||--o{ MODELS : owns
+    USERS ||--o{ TRAINING_JOBS : requests
+    MODELS ||--o{ TRAINING_JOBS : trains
+    DATASET_VERSIONS ||--o{ TRAINING_JOBS : input
+
+    TRAINING_JOBS ||--o{ TRAINING_JOB_EVENTS : events
+    TRAINING_JOBS ||--o{ TRAINING_CHECKPOINTS : checkpoints
+    TRAINING_JOBS ||--o{ MODEL_VERSIONS : produces
+    MODELS ||--o{ MODEL_VERSIONS : versions
+
+    MODEL_VERSIONS ||--o| MODEL_INTERFACES : contract
+    USERS ||--o{ INFERENCE_DEPLOYMENTS : owns
+    MODEL_VERSIONS ||--o{ INFERENCE_DEPLOYMENTS : deploys
+
+    USERS o|--o{ AUDIT_LOGS : actor
